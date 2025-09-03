@@ -131,14 +131,98 @@ En production après le cd TOUJOURS EN DÉVELOPPEMENT, cela ira sur un sous-doma
 
 ## Python/Django
 
-[À COMPLÉTER]
+Nous suivons les conventions Django standards documentées dans le cours 420-15D-FX (Applications Web et sécurité) :
+* **Documentation de référence :** https://15d.gitlab.io/docs/django/7-conventions.html
 
 ## JavaScript
 
 [À COMPLÉTER]
 
 ## Git
-[À COMPLÉTER]
+
+### Conventional Commits (Recommandé)
+
+> **Note :** L'utilisation des Conventional Commits est **facultative** mais fortement recommandée pour améliorer la lisibilité et la traçabilité de l'historique Git.
+
+Nous encourageons l'utilisation de la spécification **[Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/)** pour standardiser nos messages de commit.
+
+**Format de base :** 
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+### Langue des commits
+* **Choisir une langue (anglais OU français) et s'y tenir**
+* Idéalement : convention unifiée au niveau du repository
+* Au minimum : cohérence personnelle par développeur
+* Exemples acceptés :
+  * Anglais : `feat(auth): add password recovery`
+  * Français : `feat(auth): ajout de la récupération de mot de passe`
+
+### Types principaux
+* `feat:` nouvelle fonctionnalité
+* `fix:` correction de bug
+* `docs:` changements de documentation uniquement
+* `style:` formatage, points-virgules manquants, etc. (pas de changement de code)
+* `refactor:` refactorisation du code (ni feat, ni fix)
+* `perf:` amélioration des performances
+* `test:` ajout ou modification de tests
+* `chore:` maintenance, mise à jour de dépendances
+* `build:` changements du système de build
+* `ci:` changements de configuration CI/CD
+
+### Commits complexes
+Pour les modifications importantes, utilisez le **corps du message** pour détailler :
+```
+feat(reports): add comprehensive IP reputation reporting system
+
+- Implemented daily/weekly/monthly report generation
+- Added PDF export functionality
+- Created email notification system for critical threats
+- Integrated with existing dashboard charts
+- Added database indices for performance optimization
+
+Closes #45, #47
+```
+
+### Exemples de bons commits
+```bash
+# Simple et clair
+fix(api): correct IP validation for IPv6 addresses
+
+# Avec scope précis
+feat(dashboard): add real-time threat map visualization
+
+# Breaking change
+feat(api)!: change authentication from JWT to OAuth2
+
+BREAKING CHANGE: JWT tokens are no longer supported.
+Users must re-authenticate using OAuth2.
+
+# Commit détaillé pour changement complexe
+refactor(database): optimize IP lookup performance
+
+Restructured the IP reputation database schema to improve
+query performance:
+- Added composite index on (ip_address, report_date)
+- Denormalized frequently accessed data
+- Implemented table partitioning by month
+
+This reduces average query time from 850ms to 45ms for
+high-traffic endpoints.
+```
+
+### Conseils pratiques
+* Un commit = un changement logique
+* Écrire au présent impératif : "add feature" et non "added feature"
+* La première ligne doit faire max 50-72 caractères
+* Référencer les issues/tickets quand pertinent : `fixes #123`
+* Pour les petits changements, le titre seul suffit
+* Pour les gros changements, toujours ajouter une description détaillée
 
 # SPRINTS
 # SPRINTS [À MODIFIER, EXEMPLE, TRELLO PRIORITAIRE]
