@@ -11,7 +11,7 @@
 * **GitHub :** https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane
 * **Trello :** https://trello.com/b/5NpoecUT/projet-web
 * **Hébergement :** [URL de l'application]
-* **Documentation :** [Lien vers la documentation]
+* **Documentation :** https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/wiki
 
 # DESCRIPTION
 Ce projet consiste en le développement d'une application web transactionnelle complète dans le cadre du cours 420-18D-FX - Projet d'approfondissement Web.
@@ -40,21 +40,21 @@ Les objectifs pédagogiques incluent la gestion de projet agile, le développeme
 ## Frontend
 * **HTML5/CSS3**
 * **JavaScript (ES6+)** [À COMPLÉTER]
-* **Framework CSS :** Bootstrap 5 / [À COMPLÉTER]
+* **Framework CSS :** Bootstrap 5.x / [À COMPLÉTER]
 * **AJAX :** [À COMPLÉTER]
 
 ## Outils de développement
 * **Gestion de version :** Git/GitHub
 * **Gestion de projet :** Trello (Scrum/Agile)
 * **IDE recommandé :** VS Code / PyCharm
-* **Hébergement :** [Plateforme d'hébergement choisie]
+* **Hébergement :** VPS / Dedicated avec Docker (CD)
 
 # PRÉREQUIS
 * Python 3.13 ou supérieur
 * pip (gestionnaire de paquets Python)
 * Git
 * PostgreSQL 17
-* Environnement virtuel Python (venv)
+* Environnement virtuel Python (venv) / anaconda
 
 # INSTALLATION
 
@@ -106,7 +106,9 @@ python manage.py runserver
 
 L'application sera accessible à : http://127.0.0.1:8000/
 
-# STRUCTURE DU PROJET
+En production après le cd TOUJOURS EN DÉVELOPPEMENT, cela ira sur un sous-domaine.
+
+# STRUCTURE DU PROJET [Exemple]
 ```
 420-18D-FX-Maxime-Antoine-Ariane/
 ├── projet/                 # Configuration principale Django
@@ -139,6 +141,7 @@ L'application sera accessible à : http://127.0.0.1:8000/
 [À COMPLÉTER]
 
 # SPRINTS
+# SPRINTS [À MODIFIER, EXEMPLE, TRELLO PRIORITAIRE]
 
 ## Sprint 1 (Semaines 1-6)
 * Configuration de l'environnement
@@ -167,6 +170,12 @@ L'application sera accessible à : http://127.0.0.1:8000/
 
 # DÉPLOIEMENT
 [Instructions de déploiement à compléter selon la plateforme choisie]
+
+Petit VPS ou serveur dédié
+
+Stack équivalente avec NGINX.
+
+Pour le CD, combler avec Docker.
 
 # LICENCE
 Ce projet est développé dans le cadre du cours 420-18D-FX au Cégep Garneau.
