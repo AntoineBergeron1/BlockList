@@ -10,8 +10,9 @@
 # LIENS IMPORTANTS
 * **GitHub :** https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane
 * **Trello :** https://trello.com/b/5NpoecUT/projet-web
-* **Hébergement :** [URL de l'application]
+* **Hébergement :** https://blocklist.mich.sh
 * **Documentation :** https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/wiki
+* **Figma :** https://www.figma.com/design/0d10QDbo4IbOutv3pELJT8/Projet-Web?t=8PC1x378Z0OaPn5T-1
 
 # DESCRIPTION
 Ce projet consiste en le développement d'une application web transactionnelle complète dans le cadre du cours 420-18D-FX - Projet d'approfondissement Web.
