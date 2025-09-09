@@ -1,0 +1,29 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: 155.138.139.168
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /app
+            git fetch origin
+            git reset --hard origin/main
+            
+            cd deployment
+            docker-compose down
+            docker-compose up -d --build
+            
+            # Django migrations and static files inside container
+            docker-compose exec -T web python /app/src/manage.py migrate --noinput
+            docker-compose exec -T web python /app/src/manage.py collectstatic --noinput --clear
