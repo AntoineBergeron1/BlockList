@@ -17,7 +17,7 @@
 # DESCRIPTION
 Ce projet consiste en le développement d'une application web transactionnelle complète dans le cadre du cours 420-18D-FX - Projet d'approfondissement Web.
 
-L'application permet [DESCRIPTION DÉTAILLÉE - À COMPLÉTER].
+L'application permet de vérifier la réputation d'adresses IP (IPv4/IPv6) et de signaler des activités malveillantes. Les utilisateurs peuvent consulter l'historique des abus, soumettre des rapports sur des IP suspectes et contribuer à une base de données collaborative de blocage d'adresses malveillantes.
 
 Les objectifs pédagogiques incluent la gestion de projet agile, le développement full-stack, l'implémentation de fonctionnalités AJAX, la sécurisation d'application web et le déploiement en production.
 
