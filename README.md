@@ -139,13 +139,21 @@ Pour les conventions de commit et le workflow Git, consultez notre **[Guide des 
 ```
 
 # DÉPLOIEMENT
-[Instructions de déploiement à compléter selon la plateforme choisie]
 
-Petit VPS ou serveur dédié
+## Infrastructure
+- **Hébergeur :** Vultr VPS
+- **Type :** High Frequency (Intel)
+- **Localisation :** Toronto
+- **IPv4 :** 155.138.139.168
+- **Accès :** root / W8+sgd)aHosWz?JF
 
-Stack équivalente avec NGINX.
+## Déploiement continu
+Le déploiement est automatisé via GitHub Actions (CD) sur push vers la branche `main`.
 
-Pour le CD, combler avec Docker.
+Pour le déploiement manuel :
+```bash
+cd /home/deploy/app/deployment
+docker-compose up -d
 
 # LICENCE
 Ce projet est développé dans le cadre du cours 420-18D-FX au Cégep Garneau.
