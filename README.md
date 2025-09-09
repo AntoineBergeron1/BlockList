@@ -79,23 +79,20 @@ docker-compose up
 
 L'application sera accessible à : http://127.0.0.1:8000/
 
-# STRUCTURE DU PROJET [Exemple]
+# STRUCTURE DU PROJET [Global] [Exemple]
 ```
 420-18D-FX-Maxime-Antoine-Ariane/
-├── projet/                 # Configuration principale Django
-│   ├── settings.py        # Paramètres du projet
-│   ├── urls.py           # Routes principales
-│   └── wsgi.py           # Configuration WSGI
-├── apps/                  # Applications Django
-│   ├── utilisateurs/     # Gestion des utilisateurs
-│   ├── [autres_apps]/    # Autres modules
-├── static/               # Fichiers statiques (CSS, JS, images)
-├── templates/            # Templates HTML
-├── media/                # Fichiers uploadés
-├── requirements.txt      # Dépendances Python
-├── .env.example         # Exemple de configuration
-├── .gitignore           # Fichiers ignorés par Git
-└── README.md            # Ce fichier
+├── src/                   # Code source de l'application
+│   ├── config/           # Configuration Django
+│   ├── deepweb/          # Application principale
+│   ├── apps/             # Modules applicatifs
+│   └── static/           # Ressources (CSS, JS, images)
+├── deployment/           # Configuration de déploiement
+│   ├── docker-compose.yml
+│   └── nginx.conf
+├── docs/                 # Documentation du projet
+├── tests/                # Tests automatisés
+└── .github/              # Configuration CI/CD
 ```
 
 # CONVENTIONS DE CODE
