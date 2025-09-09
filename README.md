@@ -23,7 +23,7 @@ Les objectifs pédagogiques incluent la gestion de projet agile, le développeme
 
 # FONCTIONNALITÉS PRINCIPALES
 * **Gestion des utilisateurs :** Inscription, connexion, profils avec authentification sécurisée
-* **Transactions :** [Type de transactions - achat/réservation/inscription]
+* **Transactions :** Vérification d'adresses IP (IPv4/IPv6), soumission de rapports d'abus, consultation d'historique avec système de quotas anti-abus
 * **Recherche avancée :** Filtres multiples et tri dynamique
 * **Validations AJAX :** Validation en temps réel des formulaires
 * **Interface responsive :** Adaptée pour tous les appareils
