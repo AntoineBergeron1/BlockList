@@ -154,6 +154,7 @@ Pour le déploiement manuel :
 ```bash
 cd /home/deploy/app/deployment
 docker-compose up -d
+```
 
 # LICENCE
 Ce projet est développé dans le cadre du cours 420-18D-FX au Cégep Garneau.
