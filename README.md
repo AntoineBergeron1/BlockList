@@ -59,55 +59,25 @@ Les objectifs pédagogiques incluent la gestion de projet agile, le développeme
 
 # INSTALLATION
 
-## 1. Cloner le repository
+## Démarrage rapide
 ```bash
+# 1. Cloner le repository
 git clone https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane.git
 cd 420-18D-FX-Maxime-Antoine-Ariane
-```
 
-## 2. Créer et activer l'environnement virtuel
-```bash
-# Windows
-python -m venv venv
-venv\Scripts\activate
+# 2. Installer les dépendances (dans un environnement virtuel)
+pip install -r src/requirements.txt
 
-# Linux/Mac
-python3 -m venv venv
-source venv/bin/activate
-```
+# 3. Configurer l'environnement
+cp src/.env.example src/.env
+# Éditer src/.env avec vos configurations
 
-## 3. Installer les dépendances
-```bash
-pip install -r requirements.txt
-```
-
-## 4. Configurer les variables d'environnement
-```bash
-# Copier le fichier exemple
-cp .env.example .env
-
-# Éditer le fichier .env avec vos configurations
-```
-
-## 5. Appliquer les migrations
-```bash
-python manage.py makemigrations
-python manage.py migrate
-```
-
-## 6. Créer un superutilisateur
-```bash
-python manage.py createsuperuser
-```
-
-## 7. Lancer le serveur de développement
-```bash
-python manage.py runserver
+# 4. Lancer avec Docker (recommandé)
+cd deployment
+docker-compose up
 ```
 
 L'application sera accessible à : http://127.0.0.1:8000/
-
-En production après le cd TOUJOURS EN DÉVELOPPEMENT, cela ira sur un sous-domaine.
 
 # STRUCTURE DU PROJET [Exemple]
 ```
