@@ -16,14 +16,14 @@ jobs:
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /app
+            cd /home/deploy/app
             git fetch origin
             git reset --hard origin/main
             
-            cd deployment
-            docker-compose down
-            docker-compose up -d --build
+            cd /home/deploy/app/deployment
+            docker compose down
+            docker compose up -d --build
             
             # Django migrations and static files inside container
-            docker-compose exec -T web python /app/src/manage.py migrate --noinput
-            docker-compose exec -T web python /app/src/manage.py collectstatic --noinput --clear
+            docker compose exec -T web python /app/src/manage.py migrate --noinput
+            docker compose exec -T web python /app/src/manage.py collectstatic --noinput --clear
