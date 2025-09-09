@@ -1,6 +1,6 @@
 # 420-18D-FX-Maxime-Antoine-Ariane
 
-[![Django CI](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/django.yml/badge.svg)](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/django.yml)
+[![Django CI](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/build.yml/badge.svg)](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/build.yml)
 
 # Co-développeur.euse.s
 * Nom étudiant.e 1 : MAXIME MICHAUD
