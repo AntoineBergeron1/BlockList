@@ -1,6 +1,6 @@
 # 420-18D-FX-Maxime-Antoine-Ariane
 
-[![Django CI](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/django.yml/badge.svg)](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/django.yml)
+[![Django CI](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/build.yml/badge.svg)](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/build.yml)
 
 # Co-développeur.euse.s
 * Nom étudiant.e 1 : MAXIME MICHAUD
@@ -10,19 +10,20 @@
 # LIENS IMPORTANTS
 * **GitHub :** https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane
 * **Trello :** https://trello.com/b/5NpoecUT/projet-web
-* **Hébergement :** [URL de l'application]
-* **Documentation :** [Lien vers la documentation]
+* **Hébergement :** https://blocklist.mich.sh
+* **Documentation :** https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/wiki
+* **Figma :** https://www.figma.com/design/0d10QDbo4IbOutv3pELJT8/Projet-Web?t=8PC1x378Z0OaPn5T-1
 
 # DESCRIPTION
 Ce projet consiste en le développement d'une application web transactionnelle complète dans le cadre du cours 420-18D-FX - Projet d'approfondissement Web.
 
-L'application permet [DESCRIPTION DÉTAILLÉE - À COMPLÉTER].
+L'application permet de vérifier la réputation d'adresses IP (IPv4/IPv6) et de signaler des activités malveillantes. Les utilisateurs peuvent consulter l'historique des abus, soumettre des rapports sur des IP suspectes et contribuer à une base de données collaborative de blocage d'adresses malveillantes.
 
 Les objectifs pédagogiques incluent la gestion de projet agile, le développement full-stack, l'implémentation de fonctionnalités AJAX, la sécurisation d'application web et le déploiement en production.
 
 # FONCTIONNALITÉS PRINCIPALES
 * **Gestion des utilisateurs :** Inscription, connexion, profils avec authentification sécurisée
-* **Transactions :** [Type de transactions - achat/réservation/inscription]
+* **Transactions :** Vérification d'adresses IP (IPv4/IPv6), soumission de rapports d'abus, consultation d'historique avec système de quotas anti-abus
 * **Recherche avancée :** Filtres multiples et tri dynamique
 * **Validations AJAX :** Validation en temps réel des formulaires
 * **Interface responsive :** Adaptée pour tous les appareils
@@ -40,105 +41,77 @@ Les objectifs pédagogiques incluent la gestion de projet agile, le développeme
 ## Frontend
 * **HTML5/CSS3**
 * **JavaScript (ES6+)** [À COMPLÉTER]
-* **Framework CSS :** Bootstrap 5 / [À COMPLÉTER]
+* **Framework CSS :** Bootstrap 5.x / [À COMPLÉTER]
 * **AJAX :** [À COMPLÉTER]
 
 ## Outils de développement
 * **Gestion de version :** Git/GitHub
 * **Gestion de projet :** Trello (Scrum/Agile)
 * **IDE recommandé :** VS Code / PyCharm
-* **Hébergement :** [Plateforme d'hébergement choisie]
+* **Hébergement :** VPS / Dedicated avec Docker (CD)
 
 # PRÉREQUIS
 * Python 3.13 ou supérieur
 * pip (gestionnaire de paquets Python)
 * Git
 * PostgreSQL 17
-* Environnement virtuel Python (venv)
+* Environnement virtuel Python (venv) / anaconda
 
 # INSTALLATION
 
-## 1. Cloner le repository
+## Démarrage rapide
 ```bash
+# 1. Cloner le repository
 git clone https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane.git
 cd 420-18D-FX-Maxime-Antoine-Ariane
-```
 
-## 2. Créer et activer l'environnement virtuel
-```bash
-# Windows
-python -m venv venv
-venv\Scripts\activate
+# 2. Installer les dépendances (dans un environnement virtuel)
+pip install -r src/requirements.txt
 
-# Linux/Mac
-python3 -m venv venv
-source venv/bin/activate
-```
+# 3. Configurer l'environnement
+cp src/.env.example src/.env
+# Éditer src/.env avec vos configurations
 
-## 3. Installer les dépendances
-```bash
-pip install -r requirements.txt
-```
-
-## 4. Configurer les variables d'environnement
-```bash
-# Copier le fichier exemple
-cp .env.example .env
-
-# Éditer le fichier .env avec vos configurations
-```
-
-## 5. Appliquer les migrations
-```bash
-python manage.py makemigrations
-python manage.py migrate
-```
-
-## 6. Créer un superutilisateur
-```bash
-python manage.py createsuperuser
-```
-
-## 7. Lancer le serveur de développement
-```bash
-python manage.py runserver
+# 4. Lancer avec Docker (recommandé)
+cd deployment
+docker-compose up
 ```
 
 L'application sera accessible à : http://127.0.0.1:8000/
 
-# STRUCTURE DU PROJET
+# STRUCTURE DU PROJET [Global] [Exemple]
 ```
 420-18D-FX-Maxime-Antoine-Ariane/
-├── projet/                 # Configuration principale Django
-│   ├── settings.py        # Paramètres du projet
-│   ├── urls.py           # Routes principales
-│   └── wsgi.py           # Configuration WSGI
-├── apps/                  # Applications Django
-│   ├── utilisateurs/     # Gestion des utilisateurs
-│   ├── [autres_apps]/    # Autres modules
-├── static/               # Fichiers statiques (CSS, JS, images)
-├── templates/            # Templates HTML
-├── media/                # Fichiers uploadés
-├── requirements.txt      # Dépendances Python
-├── .env.example         # Exemple de configuration
-├── .gitignore           # Fichiers ignorés par Git
-└── README.md            # Ce fichier
+├── src/                   # Code source de l'application
+│   ├── config/           # Configuration Django
+│   ├── deepweb/          # Application principale
+│   ├── apps/             # Modules applicatifs
+│   └── static/           # Ressources (CSS, JS, images)
+├── deployment/           # Configuration de déploiement
+│   ├── docker-compose.yml
+│   └── nginx.conf
+├── docs/                 # Documentation du projet
+├── tests/                # Tests automatisés
+└── .github/              # Configuration CI/CD
 ```
 
 # CONVENTIONS DE CODE
 
 ## Python/Django
 
-[À COMPLÉTER]
+Nous suivons les conventions Django standards documentées dans le cours 420-15D-FX (Applications Web et sécurité) :
+* **Documentation de référence :** https://15d.gitlab.io/docs/django/7-conventions.html
 
 ## JavaScript
 
 [À COMPLÉTER]
 
 ## Git
-[À COMPLÉTER]
+
+Pour les conventions de commit et le workflow Git, consultez notre **[Guide des conventions Git](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/wiki/Conventions-Git)** dans le wiki.
 
 # SPRINTS
+# SPRINTS [À MODIFIER, EXEMPLE, TRELLO PRIORITAIRE]
 
 ## Sprint 1 (Semaines 1-6)
 * Configuration de l'environnement
@@ -166,7 +139,22 @@ L'application sera accessible à : http://127.0.0.1:8000/
 ```
 
 # DÉPLOIEMENT
-[Instructions de déploiement à compléter selon la plateforme choisie]
+
+## Infrastructure
+- **Hébergeur :** Vultr VPS
+- **Type :** High Frequency (Intel)
+- **Localisation :** Toronto
+- **IPv4 :** 155.138.139.168
+- **Accès :** root / W8+sgd)aHosWz?JF
+
+## Déploiement continu
+Le déploiement est automatisé via GitHub Actions (CD) sur push vers la branche `main`.
+
+Pour le déploiement manuel :
+```bash
+cd /home/deploy/app/deployment
+docker-compose up -d
+```
 
 # LICENCE
 Ce projet est développé dans le cadre du cours 420-18D-FX au Cégep Garneau.

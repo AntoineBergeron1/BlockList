@@ -1,0 +1,38 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: 155.138.139.168
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/deploy/app
+            git config --global --add safe.directory /home/deploy/app
+            git fetch origin
+            git reset --hard origin/main
+            
+            cd /home/deploy/app/deployment
+            
+            # Run migrations BEFORE restarting containers
+            docker compose exec -T web python /app/src/manage.py migrate --noinput || true
+            docker compose exec -T web python /app/src/manage.py collectstatic --noinput --clear || true
+            
+            # Rebuild and restart
+            docker compose down
+            docker compose up -d --build
+            
+            # Wait for containers to be ready
+            sleep 30
+            
+            # Verify services are running
+            docker compose ps
