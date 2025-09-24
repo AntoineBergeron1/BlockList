@@ -11,7 +11,7 @@ pathspec==0.12.1
 platformdirs==4.4.0
 psycopg2-binary==2.9.10
 pycodestyle==2.14.0
-python-dotenv==1.1.1
+python-decouple==3.8
 setuptools==80.9.0
 sqlparse==0.5.3
 tzdata==2025.2
