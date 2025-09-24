@@ -110,30 +110,6 @@ Nous suivons les conventions Django standards documentées dans le cours 420-15D
 
 Pour les conventions de commit et le workflow Git, consultez notre **[Guide des conventions Git](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/wiki/Conventions-Git)** dans le wiki.
 
-# SPRINTS
-# SPRINTS [À MODIFIER, EXEMPLE, TRELLO PRIORITAIRE]
-
-## Sprint 1 (Semaines 1-6)
-* Configuration de l'environnement
-* Architecture de base
-* Modèles de données
-* Authentification
-
-## Sprint 2 (Semaines 7-9)
-* Fonctionnalités principales
-* Interface utilisateur
-* Validations AJAX
-
-## Sprint 3 (Semaines 10-12)
-* Fonctionnalités avancées
-* Tests et corrections
-* Optimisations
-
-## Remise finale (Semaines 13-16)
-* Documentation complète
-* Déploiement en production
-* Présentation
-
 # TESTS [À COMPLÉTER]
 ```bash
 ```
