@@ -1,6 +1,17 @@
 {% extends "deepweb/base.html" %}
 
 {% block contenu %}
+
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            {% for field, errors in form.errors.items %}
+              {% for error in errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
 <form method="POST" novalidate>
 {% csrf_token %}
 {{form}}

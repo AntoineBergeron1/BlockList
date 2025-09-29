@@ -112,10 +112,16 @@ class LoginForm(forms.Form):
         required=True,
         widget=forms.TextInput(attrs={"class": "form-control"}),
         label="Nom d'utilisateur",
+          error_messages = {"required" : "Nom d'utilisateur : Le nom d'utilisateur est obligatoire",
+        "invalid" : "Nom d'utilisateur : Le nom d'utilisateur n'est pas conforme"}
+
     )
     password = forms.CharField(
         required=True,
         widget=forms.PasswordInput(attrs={"class": "form-control"}),
         label="Mot de passe",
+        error_messages = {"required" : "Mot de passe : Le mot de passe est obligatoire",
+        "invalid" : "Mot de passe : Le mot de passe n'est pas conforme"}
     )
+
 
