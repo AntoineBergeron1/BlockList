@@ -27,6 +27,19 @@
 
         <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
 
+        <div>
+       {% if user.is_authenticated %}
+            <a class="btn btn-primary" href="{% url 'deconnecter' %}">Se déconnecter</a>
+          {% else %}
+            <a class="btn btn-outline-light me-2" href="{% url 'connecter' %}">Se connecter</a>
+            <a class="btn btn-outline-light" href="{% url 'register' %}">Créer un compte</a>
+          {% endif %}
+
+
+
+
+        </div>
+
 
           <form class="d-flex me-3 " role="search">
             <input class="form-control me-2" type="search" placeholder="Rechercher" aria-label="Search" />

@@ -53,3 +53,9 @@ def connecter(request):
         form = LoginForm()
 
     return render(request, "deepweb/login.html", {"form": form})
+
+
+def deconnecter(request):
+    logout(request)
+    messages.success(request, "Déconnecté avec succès !")
+    return redirect("index")
