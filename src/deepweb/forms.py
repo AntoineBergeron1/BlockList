@@ -10,18 +10,47 @@ class RegisterForm(UserCreationForm):
         required=True,
         widget=forms.EmailInput(attrs={"class": "form-control"}),
         help_text=None,
+        error_messages={
+            "required": "Courriel : Le courriel est obligatoire",
+            "invalid": "Courriel : Le courriel est invalide",
+        },
+        label="Courriel : ",
     )
     first_name = forms.CharField(
         max_length=30,
         required=True,
         widget=forms.TextInput(attrs={"class": "form-control"}),
         help_text=None,
+        error_messages={
+            "required": "Prénom : Le prénom est obligatoire",
+        },
+        label="Prénom : ",
     )
-    last_name = forms.CharField(
-        max_length=30,
-        required=True,
-        widget=forms.TextInput(attrs={"class": "form-control"}),
-        help_text=None,
+    last_name = (
+        forms.CharField(
+            max_length=30,
+            required=True,
+            widget=forms.TextInput(attrs={"class": "form-control"}),
+            help_text=None,
+            error_messages={
+                "required": "Nom : Le nom est obligatoire",
+            },
+            label="Nom : ",
+        ),
+    )
+    password2 = forms.CharField(
+        label="Confirmer le mot de passe : ",
+        widget=forms.PasswordInput(attrs={"class": "form-control"}),
+        error_messages={
+            "required": "Confirmation du mot de passe : Veuillez confirmer votre mot de passe.",
+        },
+    )
+    password1 = forms.CharField(
+        label="Mot de passe : ",
+        widget=forms.PasswordInput(attrs={"class": "form-control"}),
+        error_messages={
+            "required": "Mot de passe : Mot de passe obligatoire.",
+        },
     )
 
     class Meta(UserCreationForm.Meta):
@@ -43,12 +72,21 @@ class RegisterForm(UserCreationForm):
                 "required": "Mot de passe : Le mot de passe est obligatoire",
                 "invalid": "Mot de passe : Le mot de passe est invalide",
             },
-            "email": {
-                "invalid": "Courriel : Le courriel est invalide",
-                "required": "Courriel : Le courriel est obligatoire",
+            "passwordConfirm": {
+                "required": "Mot de passe : La confirmation du mot de passe est obligatoire",
             },
-
         }
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError(
+                "Mot de passe : Les deux mots de passe ne correspondent pas."
+            )
+
+        return password2
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -66,6 +104,7 @@ class RegisterForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
 
 class LoginForm(forms.Form):
     username = forms.CharField(

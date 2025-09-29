@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.core.files.storage import FileSystemStorage
 
+utilisateurs = User.objects.all()
 
 # Create your views here.
 
@@ -13,10 +14,28 @@ from django.core.files.storage import FileSystemStorage
 def index(request):
     return render(request, "deepweb/index.html")
 
-
 def register(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, "Compte créé avec succès !")
+
+            return redirect("connecter")
+        else:
+            messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
+
+    else:
+        form = RegisterForm()
+
+    return render(request, "deepweb/register.html", {"form": form})
+
+
+
+def connecter(request):
+    if request.method == "POST":
+        form = LoginForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data["username"]
             password = form.cleaned_data["password"]
@@ -31,9 +50,6 @@ def register(request):
         else:
             messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
     else:
-        form = RegisterForm()
-    return render(request, "deepweb/register.html", {"form" : form})
+        form = LoginForm()
 
-
-def connecter(request):
-    return render(request, "registration/login.html")
+    return render(request, "deepweb/login.html", {"form": form})

@@ -1,9 +1,6 @@
-{% extends "deepweb/base.html" %}
-
-{% block contenu %}
+{% extends "deepweb/base.html" %} {% block contenu %}
 <form method="POST" novalidate>
-{% csrf_token %}
-{{form}}
-<input class="btn btn-primary" type="submit" value="S'inscrire">
+  {% csrf_token %} {{form}}
+  <input class="btn btn-primary" type="submit" value="Se connecter" />
 </form>
 {% endblock %}
