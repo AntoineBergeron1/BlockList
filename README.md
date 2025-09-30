@@ -54,7 +54,7 @@ Les objectifs pédagogiques incluent la gestion de projet agile, le développeme
 * Python 3.13 ou supérieur
 * pip (gestionnaire de paquets Python)
 * Git
-* PostgreSQL 17
+* PostgreSQL 18
 * Environnement virtuel Python (venv) / anaconda
 
 # INSTALLATION
