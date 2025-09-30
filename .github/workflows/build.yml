@@ -2,9 +2,9 @@ name: Django CI
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ main, dev, ariane, maxime, antoine ]
   pull_request:
-    branches: [ main, dev ]
+    branches: [ main, dev, ariane, maxime, antoine ]
 
 jobs:
   basic-test:
