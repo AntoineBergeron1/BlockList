@@ -29,13 +29,7 @@ services:
     container_name: deepweb_django
     restart: unless-stopped
     working_dir: /app
-    command: >
-      sh -c "
-        pip install --upgrade pip &&
-        pip install -r src/requirements.txt &&
-        python src/manage.py migrate &&
-        python src/manage.py runserver 0.0.0.0:8000
-      "
+    command: /app/deployment/entrypoint.sh
     volumes:
       - ../:/app
       - /app/.venv
