@@ -22,7 +22,7 @@ from deepweb import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("deepweb/", include("deepweb.urls")),
+    path("", include("deepweb.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
 
 ]
