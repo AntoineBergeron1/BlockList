@@ -113,7 +113,7 @@
               <i class="bi bi-send-fill"></i> Soumettre le signalement
             </button>
             {% if ip_address %}
-              <a href="{% url 'ip_detail' ip_address.pk %}" class="btn btn-secondary">
+              <a href="{% url 'ip_detail' ip_address.address %}" class="btn btn-secondary">
                 <i class="bi bi-x-circle"></i> Annuler
               </a>
             {% else %}

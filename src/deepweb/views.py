@@ -63,15 +63,15 @@ def deconnecter(request):
     return redirect("index")
 
 
-def ip_detail(request, ip_id):
+def ip_detail(request, ip_address):
     """
     Display IP address details with reports history.
     Shows first 10 reports, with AJAX load more functionality.
     """
-    ip_address = get_object_or_404(IPAddress, pk=ip_id)
+    ip_obj = get_object_or_404(IPAddress, address=ip_address)
 
     # Get reports with statistics
-    reports = ip_address.reports.select_related("user").order_by("-created_at")
+    reports = ip_obj.reports.select_related("user").order_by("-created_at")
 
     # Calculate statistics
     total_reports = reports.count()
@@ -82,7 +82,7 @@ def ip_detail(request, ip_id):
     initial_reports = reports[:10]
 
     context = {
-        "ip_address": ip_address,
+        "ip_address": ip_obj,
         "reports": initial_reports,
         "total_reports": total_reports,
         "first_report_date": first_report_date,
@@ -94,17 +94,17 @@ def ip_detail(request, ip_id):
 
 
 @login_required
-def report_ip(request, ip_id=None):
+def report_ip(request, ip_address=None):
     """
     Form to report an IP address.
-    If ip_id is provided, pre-fill the IP address (readonly).
+    If ip_address is provided, pre-fill the IP address (readonly).
     """
-    ip_address = None
-    if ip_id:
-        ip_address = get_object_or_404(IPAddress, pk=ip_id)
+    ip_obj = None
+    if ip_address:
+        ip_obj = get_object_or_404(IPAddress, address=ip_address)
 
     if request.method == "POST":
-        form = ReportForm(request.POST, ip_address=ip_address)
+        form = ReportForm(request.POST, ip_address=ip_obj)
         if form.is_valid():
             report = form.save(commit=False)
             report.user = request.user
@@ -114,15 +114,15 @@ def report_ip(request, ip_id=None):
                 request,
                 f"Signalement enregistré avec succès pour l'IP {report.ip_address.address}!"
             )
-            return redirect("ip_detail", ip_id=report.ip_address.pk)
+            return redirect("ip_detail", ip_address=report.ip_address.address)
         else:
             messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
     else:
-        form = ReportForm(ip_address=ip_address)
+        form = ReportForm(ip_address=ip_obj)
 
     context = {
         "form": form,
-        "ip_address": ip_address,
+        "ip_address": ip_obj,
     }
 
     return render(request, "deepweb/report_form.html", context)
