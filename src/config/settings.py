@@ -35,6 +35,7 @@ AUTH_USER_MODEL = "deepweb.User"
 
 ALLOWED_HOSTS = [".mich.sh", "127.0.0.1", "localhost", "0.0.0.0"]
 
+CSRF_TRUSTED_ORIGINS = ["https://blocklist.mich.sh", "http://localhost:8000"]
 
 # Application definition
 
