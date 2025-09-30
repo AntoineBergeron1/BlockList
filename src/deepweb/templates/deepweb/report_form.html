@@ -1,0 +1,153 @@
+{% extends "deepweb/base.html" %}
+{% load static %}
+
+{% block title %}Signaler une IP{% endblock %}
+
+{% block contenu %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header bg-danger text-white">
+        <h4 class="mb-0">
+          <i class="bi bi-flag-fill"></i> Signaler une adresse IP
+        </h4>
+      </div>
+      <div class="card-body">
+        {% if ip_address %}
+          <div class="alert alert-info">
+            <strong>Vous signalez l'adresse IP :</strong> {{ ip_address.address }}
+          </div>
+        {% endif %}
+
+        <!-- Display messages -->
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          <!-- IP Address Field -->
+          {% if form.ip_display %}
+            <div class="mb-3">
+              <label for="{{ form.ip_display.id_for_label }}" class="form-label">
+                {{ form.ip_display.label }}
+              </label>
+              {{ form.ip_display }}
+            </div>
+            {{ form.ip_address }}
+          {% else %}
+            <div class="mb-3">
+              <label for="{{ form.ip_address.id_for_label }}" class="form-label">
+                {{ form.ip_address.label }}
+                <span class="text-danger">*</span>
+              </label>
+              {{ form.ip_address }}
+              {% if form.ip_address.help_text %}
+                <div class="form-text">{{ form.ip_address.help_text }}</div>
+              {% endif %}
+              {% if form.ip_address.errors %}
+                <div class="invalid-feedback d-block">
+                  {% for error in form.ip_address.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+
+          <!-- Reason Field -->
+          <div class="mb-3">
+            <label for="{{ form.reason.id_for_label }}" class="form-label">
+              {{ form.reason.label }}
+              <span class="text-danger">*</span>
+            </label>
+            {{ form.reason }}
+            {% if form.reason.help_text %}
+              <div class="form-text">{{ form.reason.help_text }}</div>
+            {% endif %}
+            {% if form.reason.errors %}
+              <div class="invalid-feedback d-block">
+                {% for error in form.reason.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Comment Field -->
+          <div class="mb-3">
+            <label for="{{ form.comment.id_for_label }}" class="form-label">
+              {{ form.comment.label }}
+            </label>
+            {{ form.comment }}
+            {% if form.comment.help_text %}
+              <div class="form-text">{{ form.comment.help_text }}</div>
+            {% endif %}
+            {% if form.comment.errors %}
+              <div class="invalid-feedback d-block">
+                {% for error in form.comment.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Non-field errors -->
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {% for error in form.non_field_errors %}
+                {{ error }}
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- Submit buttons -->
+          <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-danger">
+              <i class="bi bi-send-fill"></i> Soumettre le signalement
+            </button>
+            {% if ip_address %}
+              <a href="{% url 'ip_detail' ip_address.pk %}" class="btn btn-secondary">
+                <i class="bi bi-x-circle"></i> Annuler
+              </a>
+            {% else %}
+              <a href="{% url 'index' %}" class="btn btn-secondary">
+                <i class="bi bi-x-circle"></i> Annuler
+              </a>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Information Box -->
+    <div class="card mt-4">
+      <div class="card-header">
+        <h6 class="mb-0">Informations sur les signalements</h6>
+      </div>
+      <div class="card-body">
+        <p class="small mb-2"><strong>Pourquoi signaler une IP ?</strong></p>
+        <p class="small">Les signalements aident la communauté à identifier et bloquer les adresses IP malveillantes. Assurez-vous que votre signalement est légitime et basé sur des preuves d'activité suspecte.</p>
+
+        <p class="small mb-2 mt-3"><strong>Catégories de signalement :</strong></p>
+        <ul class="small">
+          <li><strong>Spam :</strong> Envoi massif de messages non sollicités</li>
+          <li><strong>Hacking :</strong> Tentatives d'intrusion ou d'accès non autorisé</li>
+          <li><strong>Attaque d'application web :</strong> Exploitation de vulnérabilités web</li>
+          <li><strong>Scan de ports :</strong> Reconnaissance réseau</li>
+          <li><strong>Malware :</strong> Distribution de logiciels malveillants</li>
+          <li><strong>Hameçonnage :</strong> Tentatives de vol d'identifiants</li>
+          <li><strong>Attaque par force brute :</strong> Tentatives répétées de connexion</li>
+          <li><strong>Attaque DDoS :</strong> Déni de service distribué</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
