@@ -67,8 +67,9 @@ def ip_detail(request, ip_address):
     """
     Display IP address details with reports history.
     Shows first 10 reports, with AJAX load more functionality.
+    Creates IP if it doesn't exist (useful for checking new IPs).
     """
-    ip_obj = get_object_or_404(IPAddress, address=ip_address)
+    ip_obj, created = IPAddress.objects.get_or_create(address=ip_address)
 
     # Get reports with statistics
     reports = ip_obj.reports.select_related("user").order_by("-created_at")
@@ -88,6 +89,7 @@ def ip_detail(request, ip_address):
         "first_report_date": first_report_date,
         "last_report_date": last_report_date,
         "has_more": total_reports > 10,
+        "is_new": created,
     }
 
     return render(request, "deepweb/ip_detail.html", context)
@@ -98,10 +100,11 @@ def report_ip(request, ip_address=None):
     """
     Form to report an IP address.
     If ip_address is provided, pre-fill the IP address (readonly).
+    Creates IP if it doesn't exist.
     """
     ip_obj = None
     if ip_address:
-        ip_obj = get_object_or_404(IPAddress, address=ip_address)
+        ip_obj, created = IPAddress.objects.get_or_create(address=ip_address)
 
     if request.method == "POST":
         form = ReportForm(request.POST, ip_address=ip_obj.address if ip_obj else None)
