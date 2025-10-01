@@ -104,7 +104,7 @@ def report_ip(request, ip_address=None):
         ip_obj = get_object_or_404(IPAddress, address=ip_address)
 
     if request.method == "POST":
-        form = ReportForm(request.POST, ip_address=ip_obj)
+        form = ReportForm(request.POST, ip_address=ip_obj.address if ip_obj else None)
         if form.is_valid():
             report = form.save(commit=False)
             report.user = request.user
@@ -118,7 +118,7 @@ def report_ip(request, ip_address=None):
         else:
             messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
     else:
-        form = ReportForm(ip_address=ip_obj)
+        form = ReportForm(ip_address=ip_obj.address if ip_obj else None)
 
     context = {
         "form": form,
