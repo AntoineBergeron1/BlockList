@@ -21,12 +21,11 @@ Les objectifs pédagogiques incluent la gestion de projet agile, le développeme
 
 # FONCTIONNALITÉS PRINCIPALES
 * **Gestion des utilisateurs :** Inscription, connexion, profils avec authentification sécurisée
-* **Transactions :** Vérification d'adresses IP (IPv4/IPv6), soumission de rapports d'abus, consultation d'historique avec système de quotas anti-abus
+* **Vérification d'IP :** Consultation de la réputation d'adresses IPv4/IPv6
+* **Signalement d'abus :** Soumission de rapports sur des IP malveillantes
+* **Historique et statistiques :** Consultation de l'historique des abus avec système de quotas
 * **Recherche avancée :** Filtres multiples et tri dynamique
 * **Validations AJAX :** Validation en temps réel des formulaires
-* **Interface responsive :** Adaptée pour tous les appareils
-* **Sécurité :** Gestion des permissions et protection contre les attaques courantes
-* **Pages d'erreur personnalisées :** 400, 401, 403, 404, 500
 
 # TECHNOLOGIES UTILISÉES
 
