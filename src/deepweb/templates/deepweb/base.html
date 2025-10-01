@@ -29,11 +29,14 @@
 
         <div>
        {% if user.is_authenticated %}
+            {% if user.is_staff %}
+              <a class="btn btn-primary" href="{% url 'list_user' %}">Utilisateurs</a>
+            {% endif %}
             <a class="btn btn-primary" href="{% url 'deconnecter' %}">Se déconnecter</a>
           {% else %}
             <a class="btn btn-outline-light me-2" href="{% url 'connecter' %}">Se connecter</a>
             <a class="btn btn-outline-light" href="{% url 'register' %}">Créer un compte</a>
-          {% endif %}
+        {% endif %}
 
 
 
