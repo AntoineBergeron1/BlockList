@@ -5,6 +5,14 @@ set -e
 
 echo "🚀 Starting Django deployment script..."
 
+# Install Node.js if not present
+if ! command -v node &> /dev/null; then
+    echo "📦 Installing Node.js..."
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    apt-get install -y nodejs
+    echo "✅ Node.js installed: $(node --version)"
+fi
+
 # Wait for database to be ready
 echo "⏳ Waiting for PostgreSQL..."
 sleep 10
@@ -17,6 +25,10 @@ cd /app/src
 echo "📦 Installing Python dependencies..."
 pip install --upgrade pip
 pip install -r requirements.txt
+
+# Install Node.js dependencies
+echo "📦 Installing Node.js dependencies..."
+npm install --production
 
 # Clean up any stale migration issues
 echo "🧹 Cleaning up migrations if needed..."

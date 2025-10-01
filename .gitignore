@@ -270,3 +270,7 @@ src/static/
 
 # Version file generated at deployment
 src/version.txt
+
+# Node.js dependencies
+src/node_modules/
+src/package-lock.json

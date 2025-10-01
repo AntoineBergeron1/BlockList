@@ -1,0 +1,11 @@
+{
+  "name": "blocklist",
+  "version": "0.1.0",
+  "description": "BlockList - IP Reputation and Reporting System",
+  "private": true,
+  "dependencies": {
+    "bootstrap": "^5.3.8",
+    "@popperjs/core": "^2.11.8"
+  },
+  "devDependencies": {}
+}
