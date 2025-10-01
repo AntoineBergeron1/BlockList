@@ -2,10 +2,8 @@
 
 [![Django CI](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/build.yml/badge.svg)](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/build.yml) [![Deploy](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/deploy.yml/badge.svg)](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/deploy.yml)
 
-# Co-développeur.euse.s
-* Nom étudiant.e 1 : MAXIME MICHAUD
-* Nom étudiant.e 2 : ANTOINE BERGERON
-* Nom étudiant.e 3 : ARIANE PAQUET
+# Co-développeurs
+**Maxime Michaud, Antoine Bergeron, Ariane Paquet**
 
 # LIENS IMPORTANTS
 * **GitHub :** https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane
