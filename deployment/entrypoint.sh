@@ -30,6 +30,12 @@ python manage.py migrate --noinput
 echo "📁 Collecting static files..."
 python manage.py collectstatic --noinput || true
 
+# Generate version file with git commit hash from main branch
+echo "🔖 Generating version info..."
+cd /app
+git rev-parse --short origin/main > /app/src/version.txt 2>/dev/null || echo "unknown" > /app/src/version.txt
+cd /app/src
+
 # Create superuser if it doesn't exist (optional)
 echo "👤 Checking for superuser..."
 python manage.py shell -c "

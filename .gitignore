@@ -267,3 +267,6 @@ pyrightconfig.json
 
 # Django static files
 src/static/
+
+# Version file generated at deployment
+src/version.txt
