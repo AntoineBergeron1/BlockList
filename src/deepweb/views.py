@@ -1,4 +1,5 @@
 import os
+import ipaddress
 from .models import User, IPAddress, Report
 from .forms import RegisterForm, LoginForm, ReportForm
 from django.shortcuts import render, redirect, get_object_or_404
@@ -7,6 +8,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.db.models import Count, Min, Max
+from django.http import Http404
 
 utilisateurs = User.objects.all()
 
@@ -69,6 +71,11 @@ def ip_detail(request, ip_address):
     Shows first 10 reports, with AJAX load more functionality.
     Creates IP if it doesn't exist (useful for checking new IPs).
     """
+    try:
+        ipaddress.ip_address(ip_address)
+    except ValueError:
+        raise Http404("Adresse IP invalide")
+
     ip_obj, created = IPAddress.objects.get_or_create(address=ip_address)
 
     # Get reports with statistics
@@ -104,6 +111,10 @@ def report_ip(request, ip_address=None):
     """
     ip_obj = None
     if ip_address:
+        try:
+            ipaddress.ip_address(ip_address)
+        except ValueError:
+            raise Http404("Adresse IP invalide")
         ip_obj, created = IPAddress.objects.get_or_create(address=ip_address)
 
     if request.method == "POST":
