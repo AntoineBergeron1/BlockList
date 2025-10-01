@@ -130,11 +130,20 @@ class ReportForm(forms.ModelForm):
     Form for reporting an IP address.
     IP address field can be readonly when coming from IP detail page.
     """
+    ip_address = forms.CharField(
+        label="Adresse IP",
+        required=True,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        error_messages={
+            "required": "L'adresse IP est obligatoire.",
+            "invalid": "L'adresse IP n'est pas valide.",
+        }
+    )
+
     class Meta:
         model = Report
         fields = ["ip_address", "reason", "comment"]
         widgets = {
-            "ip_address": forms.TextInput(attrs={"class": "form-control"}),
             "reason": forms.Select(attrs={"class": "form-control"}),
             "comment": forms.Textarea(attrs={
                 "class": "form-control",
@@ -143,15 +152,10 @@ class ReportForm(forms.ModelForm):
             }),
         }
         labels = {
-            "ip_address": "Adresse IP",
             "reason": "Raison du signalement",
             "comment": "Commentaire (optionnel)",
         }
         error_messages = {
-            "ip_address": {
-                "required": "L'adresse IP est obligatoire.",
-                "invalid": "L'adresse IP n'est pas valide.",
-            },
             "reason": {
                 "required": "La raison du signalement est obligatoire.",
             },

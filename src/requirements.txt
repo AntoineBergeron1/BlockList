@@ -3,6 +3,7 @@ autopep8==2.3.2
 babel==2.17.0
 black==25.9.0
 Django==5.2.5
+django-node-assets==0.9.15
 flask-babel==4.0.0
 isort==6.0.1
 mypy-extensions==1.1.0

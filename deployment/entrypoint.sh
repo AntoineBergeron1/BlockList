@@ -5,6 +5,14 @@ set -e
 
 echo "🚀 Starting Django deployment script..."
 
+# Install Node.js if not present
+if ! command -v node &> /dev/null; then
+    echo "📦 Installing Node.js..."
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    apt-get install -y nodejs
+    echo "✅ Node.js installed: $(node --version)"
+fi
+
 # Wait for database to be ready
 echo "⏳ Waiting for PostgreSQL..."
 sleep 10
@@ -18,6 +26,10 @@ echo "📦 Installing Python dependencies..."
 pip install --upgrade pip
 pip install -r requirements.txt
 
+# Install Node.js dependencies
+echo "📦 Installing Node.js dependencies..."
+npm install --production
+
 # Clean up any stale migration issues
 echo "🧹 Cleaning up migrations if needed..."
 python manage.py migrate --fake-initial 2>/dev/null || true
@@ -29,6 +41,17 @@ python manage.py migrate --noinput
 # Collect static files
 echo "📁 Collecting static files..."
 python manage.py collectstatic --noinput || true
+
+# Generate version file if it doesn't exist (for local dev)
+echo "🔖 Checking version info..."
+if [ ! -f /app/src/version.txt ]; then
+    echo "Generating version.txt..."
+    cd /app
+    git rev-parse --short HEAD > /app/src/version.txt 2>/dev/null || echo "dev" > /app/src/version.txt
+    cd /app/src
+else
+    echo "version.txt already exists (from deploy workflow)"
+fi
 
 # Create superuser if it doesn't exist (optional)
 echo "👤 Checking for superuser..."

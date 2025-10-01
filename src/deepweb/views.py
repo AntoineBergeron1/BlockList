@@ -1,4 +1,5 @@
 import os
+import ipaddress
 from .models import User, IPAddress, Report
 from .forms import RegisterForm, LoginForm, ReportForm
 from django.shortcuts import render, redirect, get_object_or_404
@@ -7,6 +8,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.db.models import Count, Min, Max
+from django.http import Http404
 
 utilisateurs = User.objects.all()
 
@@ -67,8 +69,14 @@ def ip_detail(request, ip_address):
     """
     Display IP address details with reports history.
     Shows first 10 reports, with AJAX load more functionality.
+    Creates IP if it doesn't exist (useful for checking new IPs).
     """
-    ip_obj = get_object_or_404(IPAddress, address=ip_address)
+    try:
+        ipaddress.ip_address(ip_address)
+    except ValueError:
+        raise Http404("Adresse IP invalide")
+
+    ip_obj, created = IPAddress.objects.get_or_create(address=ip_address)
 
     # Get reports with statistics
     reports = ip_obj.reports.select_related("user").order_by("-created_at")
@@ -88,6 +96,7 @@ def ip_detail(request, ip_address):
         "first_report_date": first_report_date,
         "last_report_date": last_report_date,
         "has_more": total_reports > 10,
+        "is_new": created,
     }
 
     return render(request, "deepweb/ip_detail.html", context)
@@ -98,13 +107,18 @@ def report_ip(request, ip_address=None):
     """
     Form to report an IP address.
     If ip_address is provided, pre-fill the IP address (readonly).
+    Creates IP if it doesn't exist.
     """
     ip_obj = None
     if ip_address:
-        ip_obj = get_object_or_404(IPAddress, address=ip_address)
+        try:
+            ipaddress.ip_address(ip_address)
+        except ValueError:
+            raise Http404("Adresse IP invalide")
+        ip_obj, created = IPAddress.objects.get_or_create(address=ip_address)
 
     if request.method == "POST":
-        form = ReportForm(request.POST, ip_address=ip_obj)
+        form = ReportForm(request.POST, ip_address=ip_obj.address if ip_obj else None)
         if form.is_valid():
             report = form.save(commit=False)
             report.user = request.user
@@ -118,7 +132,7 @@ def report_ip(request, ip_address=None):
         else:
             messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
     else:
-        form = ReportForm(ip_address=ip_obj)
+        form = ReportForm(ip_address=ip_obj.address if ip_obj else None)
 
     context = {
         "form": form,
