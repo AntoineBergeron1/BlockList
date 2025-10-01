@@ -1,0 +1,11 @@
+[run]
+omit =
+    */migrations/*
+    */tests/*
+    */__pycache__/*
+
+[report]
+omit =
+    */migrations/*
+    */tests/*
+    */__pycache__/*
