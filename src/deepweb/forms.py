@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
-from .models import User
+from .models import User, Report, IPAddress
 
 
 
@@ -125,3 +125,76 @@ class LoginForm(forms.Form):
     )
 
 
+class ReportForm(forms.ModelForm):
+    """
+    Form for reporting an IP address.
+    IP address field can be readonly when coming from IP detail page.
+    """
+    class Meta:
+        model = Report
+        fields = ["ip_address", "reason", "comment"]
+        widgets = {
+            "ip_address": forms.TextInput(attrs={"class": "form-control"}),
+            "reason": forms.Select(attrs={"class": "form-control"}),
+            "comment": forms.Textarea(attrs={
+                "class": "form-control",
+                "rows": 5,
+                "placeholder": "Décrivez l'activité suspecte observée..."
+            }),
+        }
+        labels = {
+            "ip_address": "Adresse IP",
+            "reason": "Raison du signalement",
+            "comment": "Commentaire (optionnel)",
+        }
+        error_messages = {
+            "ip_address": {
+                "required": "L'adresse IP est obligatoire.",
+                "invalid": "L'adresse IP n'est pas valide.",
+            },
+            "reason": {
+                "required": "La raison du signalement est obligatoire.",
+            },
+        }
+
+    def __init__(self, *args, **kwargs):
+        ip_address = kwargs.pop("ip_address", None)
+        readonly = kwargs.pop("readonly", False)
+        super().__init__(*args, **kwargs)
+
+        # Pre-fill IP address if provided
+        if ip_address:
+            self.fields["ip_address"].initial = ip_address
+            self.fields["ip_address"].widget = forms.HiddenInput()
+            # Add a readonly display field
+            self.fields["ip_display"] = forms.CharField(
+                label="Adresse IP",
+                initial=ip_address,
+                disabled=True,
+                required=False,
+                widget=forms.TextInput(attrs={"class": "form-control"})
+            )
+
+        # Make IP field readonly if specified
+        if readonly:
+            self.fields["ip_address"].widget.attrs["readonly"] = True
+
+    def clean_ip_address(self):
+        """
+        Validate and get or create IP address.
+        """
+        ip_input = self.cleaned_data.get("ip_address")
+
+        # If ip_input is already an IPAddress instance
+        if isinstance(ip_input, IPAddress):
+            return ip_input
+
+        # If it's a string, validate and get or create
+        if isinstance(ip_input, str):
+            try:
+                ip_address, created = IPAddress.objects.get_or_create(address=ip_input)
+                return ip_address
+            except Exception as e:
+                raise forms.ValidationError(f"Adresse IP invalide : {e}")
+
+        return ip_input
