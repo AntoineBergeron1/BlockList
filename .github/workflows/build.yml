@@ -47,6 +47,11 @@ jobs:
         python manage.py collectstatic --noinput
       continue-on-error: true
 
+    - name: Run pytest tests
+      run: |
+        cd src
+        pytest --cov=deepweb --cov-report=term
+
 # ============================================================================
 # FUTURE FEATURES
 # ============================================================================
