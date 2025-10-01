@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.db.models import Count, Min, Max
 from django.http import Http404
+from django.conf import settings  # TODO: Used for DEBUG in login view quick-login buttons
 
 utilisateurs = User.objects.all()
 
@@ -56,7 +57,8 @@ def connecter(request):
     else:
         form = LoginForm()
 
-    return render(request, "deepweb/login.html", {"form": form})
+    # TODO: Remove 'debug' context when removing quick-login development buttons
+    return render(request, "deepweb/login.html", {"form": form, "debug": settings.DEBUG})
 
 
 def deconnecter(request):
