@@ -1,11 +1,9 @@
 # 420-18D-FX-Maxime-Antoine-Ariane
 
-[![Django CI](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/build.yml/badge.svg)](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/build.yml)
+[![Django CI](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/build.yml/badge.svg)](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/build.yml) [![Deploy](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/deploy.yml/badge.svg)](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/deploy.yml)
 
-# Co-développeur.euse.s
-* Nom étudiant.e 1 : MAXIME MICHAUD
-* Nom étudiant.e 2 : ANTOINE BERGERON
-* Nom étudiant.e 3 : ARIANE PAQUET
+# Co-développeurs
+**Maxime Michaud, Antoine Bergeron, Ariane Paquet**
 
 # LIENS IMPORTANTS
 * **GitHub :** https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane
@@ -23,12 +21,11 @@ Les objectifs pédagogiques incluent la gestion de projet agile, le développeme
 
 # FONCTIONNALITÉS PRINCIPALES
 * **Gestion des utilisateurs :** Inscription, connexion, profils avec authentification sécurisée
-* **Transactions :** Vérification d'adresses IP (IPv4/IPv6), soumission de rapports d'abus, consultation d'historique avec système de quotas anti-abus
+* **Vérification d'IP :** Consultation de la réputation d'adresses IPv4/IPv6
+* **Signalement d'abus :** Soumission de rapports sur des IP malveillantes
+* **Historique et statistiques :** Consultation de l'historique des abus avec système de quotas
 * **Recherche avancée :** Filtres multiples et tri dynamique
 * **Validations AJAX :** Validation en temps réel des formulaires
-* **Interface responsive :** Adaptée pour tous les appareils
-* **Sécurité :** Gestion des permissions et protection contre les attaques courantes
-* **Pages d'erreur personnalisées :** 400, 401, 403, 404, 500
 
 # TECHNOLOGIES UTILISÉES
 
@@ -79,20 +76,17 @@ docker-compose up
 
 L'application sera accessible à : http://127.0.0.1:8000/
 
-# STRUCTURE DU PROJET [Global] [Exemple]
+# STRUCTURE DU PROJET
 ```
 420-18D-FX-Maxime-Antoine-Ariane/
-├── src/                   # Code source de l'application
-│   ├── config/           # Configuration Django
+├── src/                   # Code source Django
+│   ├── config/           # Configuration (settings, urls)
 │   ├── deepweb/          # Application principale
-│   ├── apps/             # Modules applicatifs
-│   └── static/           # Ressources (CSS, JS, images)
-├── deployment/           # Configuration de déploiement
-│   ├── docker-compose.yml
-│   └── nginx.conf
-├── docs/                 # Documentation du projet
-├── tests/                # Tests automatisés
-└── .github/              # Configuration CI/CD
+│   ├── static/           # Fichiers statiques
+│   └── templates/        # Templates HTML
+├── deployment/           # Configuration Docker
+├── .github/workflows/    # CI/CD
+└── logs/                 # Logs applicatifs
 ```
 
 # CONVENTIONS DE CODE

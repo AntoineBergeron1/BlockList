@@ -53,17 +53,9 @@ else
     echo "version.txt already exists (from deploy workflow)"
 fi
 
-# Create superuser if it doesn't exist (optional)
-echo "👤 Checking for superuser..."
-python manage.py shell -c "
-from django.contrib.auth import get_user_model
-User = get_user_model()
-if not User.objects.filter(username='admin').exists():
-    User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
-    print('✅ Superuser created: admin/admin123')
-else:
-    print('ℹ️ Superuser already exists')
-" || true
+# Create test users (for development quick login)
+echo "👤 Creating test users..."
+python manage.py create_test_users || true
 
 echo "✅ Django setup complete!"
 

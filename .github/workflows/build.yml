@@ -10,7 +10,22 @@ jobs:
   basic-test:
     name: Basic Django Test
     runs-on: ubuntu-latest
-    
+
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_deepweb_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
@@ -29,6 +44,11 @@ jobs:
       run: |
         echo "SECRET_KEY=test-secret-key-for-ci-only" > src/.env
         echo "DEBUG=True" >> src/.env
+        echo "DB_NAME=test_deepweb_db" >> src/.env
+        echo "DB_USER=postgres" >> src/.env
+        echo "DB_PASSWORD=postgres" >> src/.env
+        echo "DB_HOST=localhost" >> src/.env
+        echo "DB_PORT=5432" >> src/.env
         
     - name: Check Django setup
       run: |
@@ -46,6 +66,11 @@ jobs:
         cd src
         python manage.py collectstatic --noinput
       continue-on-error: true
+
+    - name: Run pytest tests
+      run: |
+        cd src
+        pytest --cov=deepweb --cov-report=term
 
 # ============================================================================
 # FUTURE FEATURES
