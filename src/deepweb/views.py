@@ -143,12 +143,17 @@ def report_ip(request, ip_address=None):
 
 @login_required
 def list_user(request):
+    """Liste utilisateurs"""
     utilisateurs = User.objects.all()
+
+    if not request.user.is_staff:
+        return render(request, "deepweb/403.html")
 
     return render(request, "deepweb/list_user.html", {'utilisateurs':utilisateurs})
 
 @login_required
 def list_user_update(request, pk):
+    """Liste utilisateurs mise a jour"""
     utilisateur = get_object_or_404(User,id=pk)
 
     if request.method == "POST":
