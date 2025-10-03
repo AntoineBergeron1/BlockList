@@ -13,10 +13,10 @@
                 <p class="card-text">Prénom : {{util.first_name}}</p>
                 <p class="card-text">Nom : {{util.last_name}}</p>
                 <p class="card-text">
-                    Est Staff : <input type="checkbox" name="is_staff" value={{util.is_staff}} {% if util.is_staff %} checked {% endif %}>
+                    Est Staff : <input type="checkbox" name="is_staff" value={{util.is_staff}} {% if util.is_staff %} checked {% endif %} {% if util.username == user.username %} readonly disabled {% endif %}>
                 </p>
                 <p class="card-text">
-                    Est Actif : <input type="checkbox" name="is_active" value={{util.is_active}} {% if util.is_active %} checked {% endif %}>
+                    Est Actif : <input type="checkbox" name="is_active" value={{util.is_active}} {% if util.is_active %} checked {% endif %} {% if util.username == user.username %} readonly disabled {% endif %}>
                 </p>
 
                 <button class="btn btn-primary">Sauvegarder</button>
