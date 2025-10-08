@@ -142,3 +142,27 @@ def report_ip(request, ip_address=None):
     }
 
     return render(request, "deepweb/report_form.html", context)
+
+@login_required
+def list_user(request):
+    """Liste utilisateurs"""
+    user = request.user
+    utilisateurs = User.objects.all()
+
+    if not request.user.is_staff:
+        return render(request, "deepweb/403.html")
+
+    return render(request, "deepweb/list_user.html", {'utilisateurs':utilisateurs, 'user':user})
+
+@login_required
+def list_user_update(request, pk):
+    """Liste utilisateurs mise a jour"""
+    utilisateur = get_object_or_404(User,id=pk)
+
+    if request.method == "POST":
+        utilisateur.is_staff = "is_staff" in request.POST
+        utilisateur.is_active = "is_active" in request.POST
+        utilisateur.save()
+
+
+    return redirect('list_user')
