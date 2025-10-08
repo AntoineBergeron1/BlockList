@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,8 +30,12 @@ SECRET_KEY = "django-insecure-sbrmgx8rz%qs9kb4+zq-t+wyvlbk8n^4#2y&b%o(_lt9)wqtf^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [".mich.sh"]
+AUTH_USER_MODEL = "deepweb.User"
 
+
+ALLOWED_HOSTS = [".mich.sh", "127.0.0.1", "localhost", "0.0.0.0"]
+
+CSRF_TRUSTED_ORIGINS = ["https://blocklist.mich.sh", "http://localhost:8000"]
 
 # Application definition
 
@@ -37,6 +46,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_node_assets",
+    "deepweb"
 ]
 
 MIDDLEWARE = [
@@ -61,6 +72,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "deepweb.context_processors.git_version",
             ],
         },
     },
@@ -74,8 +86,12 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": os.getenv("DATABASE_ENGINE", "django.db.backends.postgresql"),
+        "NAME": os.getenv("DB_NAME", "deepweb_db"),
+        "USER": os.getenv("DB_USER", "deepweb_user"),
+        "PASSWORD": os.getenv("DB_PASSWORD", "changeme"),
+        "HOST": os.getenv("DB_HOST", "localhost"),
+        "PORT": os.getenv("DB_PORT", "5432"),
     }
 }
 
@@ -102,9 +118,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "fr-ca"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "America/Montreal"
 
 USE_I18N = True
 
@@ -115,6 +131,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "static"
+
+# Node.js packages configuration
+NODE_PACKAGE_JSON = BASE_DIR / "package.json"
+NODE_MODULES_ROOT = BASE_DIR / "node_modules"
+
+# Static files finders
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "django_node_assets.finders.NodeModulesFinder",
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

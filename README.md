@@ -1,11 +1,9 @@
 # 420-18D-FX-Maxime-Antoine-Ariane
 
-[![Django CI](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/build.yml/badge.svg)](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/build.yml)
+[![Django CI](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/build.yml/badge.svg)](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/build.yml) [![Deploy](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/deploy.yml/badge.svg)](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/actions/workflows/deploy.yml)
 
-# Co-développeur.euse.s
-* Nom étudiant.e 1 : MAXIME MICHAUD
-* Nom étudiant.e 2 : ANTOINE BERGERON
-* Nom étudiant.e 3 : ARIANE PAQUET
+# Co-développeurs
+**Maxime Michaud, Antoine Bergeron, Ariane Paquet**
 
 # LIENS IMPORTANTS
 * **GitHub :** https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane
@@ -23,12 +21,11 @@ Les objectifs pédagogiques incluent la gestion de projet agile, le développeme
 
 # FONCTIONNALITÉS PRINCIPALES
 * **Gestion des utilisateurs :** Inscription, connexion, profils avec authentification sécurisée
-* **Transactions :** Vérification d'adresses IP (IPv4/IPv6), soumission de rapports d'abus, consultation d'historique avec système de quotas anti-abus
+* **Vérification d'IP :** Consultation de la réputation d'adresses IPv4/IPv6
+* **Signalement d'abus :** Soumission de rapports sur des IP malveillantes
+* **Historique et statistiques :** Consultation de l'historique des abus avec système de quotas
 * **Recherche avancée :** Filtres multiples et tri dynamique
 * **Validations AJAX :** Validation en temps réel des formulaires
-* **Interface responsive :** Adaptée pour tous les appareils
-* **Sécurité :** Gestion des permissions et protection contre les attaques courantes
-* **Pages d'erreur personnalisées :** 400, 401, 403, 404, 500
 
 # TECHNOLOGIES UTILISÉES
 
@@ -54,7 +51,7 @@ Les objectifs pédagogiques incluent la gestion de projet agile, le développeme
 * Python 3.13 ou supérieur
 * pip (gestionnaire de paquets Python)
 * Git
-* PostgreSQL 17
+* PostgreSQL 18
 * Environnement virtuel Python (venv) / anaconda
 
 # INSTALLATION
@@ -79,20 +76,17 @@ docker-compose up
 
 L'application sera accessible à : http://127.0.0.1:8000/
 
-# STRUCTURE DU PROJET [Global] [Exemple]
+# STRUCTURE DU PROJET
 ```
 420-18D-FX-Maxime-Antoine-Ariane/
-├── src/                   # Code source de l'application
-│   ├── config/           # Configuration Django
+├── src/                   # Code source Django
+│   ├── config/           # Configuration (settings, urls)
 │   ├── deepweb/          # Application principale
-│   ├── apps/             # Modules applicatifs
-│   └── static/           # Ressources (CSS, JS, images)
-├── deployment/           # Configuration de déploiement
-│   ├── docker-compose.yml
-│   └── nginx.conf
-├── docs/                 # Documentation du projet
-├── tests/                # Tests automatisés
-└── .github/              # Configuration CI/CD
+│   ├── static/           # Fichiers statiques
+│   └── templates/        # Templates HTML
+├── deployment/           # Configuration Docker
+├── .github/workflows/    # CI/CD
+└── logs/                 # Logs applicatifs
 ```
 
 # CONVENTIONS DE CODE
@@ -109,30 +103,6 @@ Nous suivons les conventions Django standards documentées dans le cours 420-15D
 ## Git
 
 Pour les conventions de commit et le workflow Git, consultez notre **[Guide des conventions Git](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/wiki/Conventions-Git)** dans le wiki.
-
-# SPRINTS
-# SPRINTS [À MODIFIER, EXEMPLE, TRELLO PRIORITAIRE]
-
-## Sprint 1 (Semaines 1-6)
-* Configuration de l'environnement
-* Architecture de base
-* Modèles de données
-* Authentification
-
-## Sprint 2 (Semaines 7-9)
-* Fonctionnalités principales
-* Interface utilisateur
-* Validations AJAX
-
-## Sprint 3 (Semaines 10-12)
-* Fonctionnalités avancées
-* Tests et corrections
-* Optimisations
-
-## Remise finale (Semaines 13-16)
-* Documentation complète
-* Déploiement en production
-* Présentation
 
 # TESTS [À COMPLÉTER]
 ```bash

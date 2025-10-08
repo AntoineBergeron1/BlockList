@@ -20,13 +20,16 @@ jobs:
             git config --global --add safe.directory /home/deploy/app
             git fetch origin
             git reset --hard origin/main
-            
+
+            # Generate version file before starting containers
+            git rev-parse --short HEAD > /home/deploy/app/src/version.txt
+
             cd /home/deploy/app/deployment
-            
+
             # Run migrations BEFORE restarting containers
             docker compose exec -T web python /app/src/manage.py migrate --noinput || true
             docker compose exec -T web python /app/src/manage.py collectstatic --noinput --clear || true
-            
+
             # Rebuild and restart
             docker compose down
             docker compose up -d --build
