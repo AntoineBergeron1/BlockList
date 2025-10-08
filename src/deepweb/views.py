@@ -1,6 +1,6 @@
 import os
 from .models import User, IPAddress, Report
-from .forms import RegisterForm, LoginForm, ReportForm
+from .forms import RegisterForm, LoginForm, ReportForm, SearchForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
@@ -9,12 +9,15 @@ from django.core.files.storage import FileSystemStorage
 from django.db.models import Count, Min, Max
 
 utilisateurs = User.objects.all()
+lesIps = IPAddress.objects.all()
 
 # Create your views here.
 
 
 def index(request):
-    return render(request, "deepweb/index.html")
+    form = SearchForm()
+    return render(request, "deepweb/index.html", {"form": form})
+
 
 def register(request):
     if request.method == "POST":
@@ -32,7 +35,6 @@ def register(request):
         form = RegisterForm()
 
     return render(request, "deepweb/register.html", {"form": form})
-
 
 
 def connecter(request):
@@ -112,7 +114,7 @@ def report_ip(request, ip_address=None):
 
             messages.success(
                 request,
-                f"Signalement enregistré avec succès pour l'IP {report.ip_address.address}!"
+                f"Signalement enregistré avec succès pour l'IP {report.ip_address.address}!",
             )
             return redirect("ip_detail", ip_address=report.ip_address.address)
         else:
@@ -126,3 +128,23 @@ def report_ip(request, ip_address=None):
     }
 
     return render(request, "deepweb/report_form.html", context)
+
+
+def rechercher(request):
+    print("fonction rechercher lancée")
+    if request.method == "POST":
+        print("méthode post détectée")
+        form = SearchForm(request.POST)
+        if form.is_valid():
+            print("formulaire valide")
+            resultat_recherche = form.cleaned_data["recherche"]
+            if resultat_recherche:
+                results = IPAddress.objects.filter(address=resultat_recherche)
+                print(lesIps.count())
+            else:
+                results = IPAddress.objects.none()
+                print("fonctionne pas")
+        else:
+            results = IPAddress.objects.all()
+
+    return render(request, "deepweb/index.html", {"form": form, "results": results})

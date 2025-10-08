@@ -4,7 +4,6 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import User, Report, IPAddress
 
 
-
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(
         required=True,
@@ -112,16 +111,19 @@ class LoginForm(forms.Form):
         required=True,
         widget=forms.TextInput(attrs={"class": "form-control"}),
         label="Nom d'utilisateur",
-          error_messages = {"required" : "Nom d'utilisateur : Le nom d'utilisateur est obligatoire",
-        "invalid" : "Nom d'utilisateur : Le nom d'utilisateur n'est pas conforme"}
-
+        error_messages={
+            "required": "Nom d'utilisateur : Le nom d'utilisateur est obligatoire",
+            "invalid": "Nom d'utilisateur : Le nom d'utilisateur n'est pas conforme",
+        },
     )
     password = forms.CharField(
         required=True,
         widget=forms.PasswordInput(attrs={"class": "form-control"}),
         label="Mot de passe",
-        error_messages = {"required" : "Mot de passe : Le mot de passe est obligatoire",
-        "invalid" : "Mot de passe : Le mot de passe n'est pas conforme"}
+        error_messages={
+            "required": "Mot de passe : Le mot de passe est obligatoire",
+            "invalid": "Mot de passe : Le mot de passe n'est pas conforme",
+        },
     )
 
 
@@ -130,17 +132,20 @@ class ReportForm(forms.ModelForm):
     Form for reporting an IP address.
     IP address field can be readonly when coming from IP detail page.
     """
+
     class Meta:
         model = Report
         fields = ["ip_address", "reason", "comment"]
         widgets = {
             "ip_address": forms.TextInput(attrs={"class": "form-control"}),
             "reason": forms.Select(attrs={"class": "form-control"}),
-            "comment": forms.Textarea(attrs={
-                "class": "form-control",
-                "rows": 5,
-                "placeholder": "Décrivez l'activité suspecte observée..."
-            }),
+            "comment": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 5,
+                    "placeholder": "Décrivez l'activité suspecte observée...",
+                }
+            ),
         }
         labels = {
             "ip_address": "Adresse IP",
@@ -172,7 +177,7 @@ class ReportForm(forms.ModelForm):
                 initial=ip_address,
                 disabled=True,
                 required=False,
-                widget=forms.TextInput(attrs={"class": "form-control"})
+                widget=forms.TextInput(attrs={"class": "form-control"}),
             )
 
         # Make IP field readonly if specified
@@ -198,3 +203,19 @@ class ReportForm(forms.ModelForm):
                 raise forms.ValidationError(f"Adresse IP invalide : {e}")
 
         return ip_input
+
+
+class SearchForm(forms.Form):
+    recherche = forms.CharField(
+        max_length=100,
+        min_length=3,
+        required=True,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control ",
+                "style": "width : 350px;",
+                "placeholder": "Rechercher une adresse IP...",
+            }
+        ),
+        label="",
+    )
