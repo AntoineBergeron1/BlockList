@@ -5,7 +5,7 @@ black==25.9.0
 Django==5.2.7
 django-node-assets==0.9.15
 flask-babel==4.0.0
-isort==6.1.0
+isort==7.0.0
 mypy-extensions==1.1.0
 packaging==25.0
 pathspec==0.12.1
