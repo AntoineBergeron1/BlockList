@@ -21,4 +21,27 @@
         </div>
     {% endif %}
 
+    <h1>BlockList</h1>
+
+    <h2>Dernière ip reportées :</h2>
+    <div class="row">
+        {% for signalement in signalements %}
+            <div class="col-sm-6">
+                <div class="card m-2">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h3 class="card-title">{{signalement.ip_address}}</h3>
+                            <p class="badge bg-warning">{{signalement.reason}}</p>
+                        </div>
+                        {% if signalement.comment %}
+                            <p class="card-text">Commentaire : {{signalement.comment}}</p>
+                        {% endif %}
+                        <p>Signalé par : {{signalement.user}}</p>
+                        <p class="small mb-3">{{signalement.created_at|date:"d/m/Y"}}</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
 {% endblock %}

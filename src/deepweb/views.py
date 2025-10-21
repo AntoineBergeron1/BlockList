@@ -17,7 +17,10 @@ utilisateurs = User.objects.all()
 
 
 def index(request):
-    return render(request, "deepweb/index.html")
+    """Voir les dernières ip reportées sur la page accueil"""
+    signalements = Report.objects.all()
+
+    return render(request, "deepweb/index.html", {"signalements":signalements})
 
 def register(request):
     if request.method == "POST":
