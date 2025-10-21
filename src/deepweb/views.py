@@ -1,4 +1,5 @@
 import os
+import ipaddress
 from .models import User, IPAddress, Report
 from .forms import RegisterForm, LoginForm, ReportForm, SearchForm
 from django.shortcuts import render, redirect, get_object_or_404
@@ -7,16 +8,32 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.db.models import Count, Min, Max
+from django.http import Http404
+from django.conf import (
+    settings,
+)  # TODO: Used for DEBUG in login view quick-login buttons
 
 utilisateurs = User.objects.all()
+<<<<<<< HEAD
 lesIps = IPAddress.objects.all()
+=======
+reports = Report.objects.all()
+>>>>>>> 1e90755596fdc22bc4c3a5332fc6fd4e842f15bc
 
 # Create your views here.
 
 
 def index(request):
     form = SearchForm()
+<<<<<<< HEAD
     return render(request, "deepweb/index.html", {"form": form})
+=======
+    return render(
+        request,
+        "deepweb/index.html",
+        {"form": form, "results": IPAddress.objects.all(), "reports": reports},
+    )
+>>>>>>> 1e90755596fdc22bc4c3a5332fc6fd4e842f15bc
 
 
 def register(request):
@@ -56,7 +73,10 @@ def connecter(request):
     else:
         form = LoginForm()
 
-    return render(request, "deepweb/login.html", {"form": form})
+    # TODO: Remove 'debug' context when removing quick-login development buttons
+    return render(
+        request, "deepweb/login.html", {"form": form, "debug": settings.DEBUG}
+    )
 
 
 def deconnecter(request):
@@ -69,8 +89,14 @@ def ip_detail(request, ip_address):
     """
     Display IP address details with reports history.
     Shows first 10 reports, with AJAX load more functionality.
+    Creates IP if it doesn't exist (useful for checking new IPs).
     """
-    ip_obj = get_object_or_404(IPAddress, address=ip_address)
+    try:
+        ipaddress.ip_address(ip_address)
+    except ValueError:
+        raise Http404("Adresse IP invalide")
+
+    ip_obj, created = IPAddress.objects.get_or_create(address=ip_address)
 
     # Get reports with statistics
     reports = ip_obj.reports.select_related("user").order_by("-created_at")
@@ -90,6 +116,7 @@ def ip_detail(request, ip_address):
         "first_report_date": first_report_date,
         "last_report_date": last_report_date,
         "has_more": total_reports > 10,
+        "is_new": created,
     }
 
     return render(request, "deepweb/ip_detail.html", context)
@@ -100,13 +127,18 @@ def report_ip(request, ip_address=None):
     """
     Form to report an IP address.
     If ip_address is provided, pre-fill the IP address (readonly).
+    Creates IP if it doesn't exist.
     """
     ip_obj = None
     if ip_address:
-        ip_obj = get_object_or_404(IPAddress, address=ip_address)
+        try:
+            ipaddress.ip_address(ip_address)
+        except ValueError:
+            raise Http404("Adresse IP invalide")
+        ip_obj, created = IPAddress.objects.get_or_create(address=ip_address)
 
     if request.method == "POST":
-        form = ReportForm(request.POST, ip_address=ip_obj)
+        form = ReportForm(request.POST, ip_address=ip_obj.address if ip_obj else None)
         if form.is_valid():
             report = form.save(commit=False)
             report.user = request.user
@@ -120,7 +152,7 @@ def report_ip(request, ip_address=None):
         else:
             messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
     else:
-        form = ReportForm(ip_address=ip_obj)
+        form = ReportForm(ip_address=ip_obj.address if ip_obj else None)
 
     context = {
         "form": form,
@@ -130,8 +162,39 @@ def report_ip(request, ip_address=None):
     return render(request, "deepweb/report_form.html", context)
 
 
+<<<<<<< HEAD
 def rechercher(request):
     print("fonction rechercher lancée")
+=======
+@login_required
+def list_user(request):
+    """Liste utilisateurs"""
+    user = request.user
+    utilisateurs = User.objects.all()
+
+    if not request.user.is_staff:
+        return render(request, "deepweb/403.html")
+
+    return render(
+        request, "deepweb/list_user.html", {"utilisateurs": utilisateurs, "user": user}
+    )
+
+
+@login_required
+def list_user_update(request, pk):
+    """Liste utilisateurs mise a jour"""
+    utilisateur = get_object_or_404(User, id=pk)
+
+    if request.method == "POST":
+        utilisateur.is_staff = "is_staff" in request.POST
+        utilisateur.is_active = "is_active" in request.POST
+        utilisateur.save()
+
+    return redirect("list_user")
+
+
+def rechercher(request):
+>>>>>>> 1e90755596fdc22bc4c3a5332fc6fd4e842f15bc
     if request.method == "POST":
         print("méthode post détectée")
         form = SearchForm(request.POST)
@@ -140,6 +203,7 @@ def rechercher(request):
             resultat_recherche = form.cleaned_data["recherche"]
             if resultat_recherche:
                 results = IPAddress.objects.filter(address=resultat_recherche)
+<<<<<<< HEAD
                 print(lesIps.count())
             else:
                 results = IPAddress.objects.none()
@@ -148,3 +212,16 @@ def rechercher(request):
             results = IPAddress.objects.all()
 
     return render(request, "deepweb/index.html", {"form": form, "results": results})
+=======
+            else:
+
+                results = IPAddress.objects.none()
+        else:
+            results = IPAddress.objects.all()
+
+    return render(
+        request,
+        "deepweb/index.html",
+        {"form": form, "results": results, "reports": reports},
+    )
+>>>>>>> 1e90755596fdc22bc4c3a5332fc6fd4e842f15bc

@@ -1,0 +1,22 @@
+[tool.black]
+line-length = 88
+target-version = ['py313']
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | venv
+  | node_modules
+  | migrations
+  | __pycache__
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 88
+skip_glob = ["*/migrations/*", "*/node_modules/*", "*/.venv/*", "*/venv/*"]
+known_django = ["django"]
+sections = ["FUTURE", "STDLIB", "DJANGO", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
