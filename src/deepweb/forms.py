@@ -221,5 +221,8 @@ class SearchForm(forms.Form):
                 "placeholder": "Rechercher une adresse IP...",
             }
         ),
+        error_messages={
+            "invalid": "Adresse IP : Le format de l'adresse IP ne correspond pas à un IPV4 ou IPV6 valide.",
+        },
         label="",
     )

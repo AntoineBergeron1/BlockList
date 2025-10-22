@@ -188,15 +188,12 @@ def list_user_update(request, pk):
 
 def rechercher(request):
     if request.method == "POST":
-        print("méthode post détectée")
         form = SearchForm(request.POST)
         if form.is_valid():
-            print("formulaire valide")
             resultat_recherche = form.cleaned_data["recherche"]
             if resultat_recherche:
                 results = IPAddress.objects.filter(address=resultat_recherche)
             else:
-
                 results = IPAddress.objects.none()
         else:
             results = IPAddress.objects.all()
