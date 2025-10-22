@@ -133,8 +133,6 @@ class ReportForm(forms.ModelForm):
     IP address field can be readonly when coming from IP detail page.
     """
 
-<<<<<<< HEAD
-=======
     ip_address = forms.CharField(
         label="Adresse IP",
         required=True,
@@ -145,7 +143,6 @@ class ReportForm(forms.ModelForm):
         },
     )
 
->>>>>>> 1e90755596fdc22bc4c3a5332fc6fd4e842f15bc
     class Meta:
         model = Report
         fields = ["ip_address", "reason", "comment"]

@@ -14,26 +14,19 @@ from django.conf import (
 )  # TODO: Used for DEBUG in login view quick-login buttons
 
 utilisateurs = User.objects.all()
-<<<<<<< HEAD
 lesIps = IPAddress.objects.all()
-=======
 reports = Report.objects.all()
->>>>>>> 1e90755596fdc22bc4c3a5332fc6fd4e842f15bc
 
 # Create your views here.
 
 
 def index(request):
     form = SearchForm()
-<<<<<<< HEAD
-    return render(request, "deepweb/index.html", {"form": form})
-=======
     return render(
         request,
         "deepweb/index.html",
         {"form": form, "results": IPAddress.objects.all(), "reports": reports},
     )
->>>>>>> 1e90755596fdc22bc4c3a5332fc6fd4e842f15bc
 
 
 def register(request):
@@ -162,10 +155,10 @@ def report_ip(request, ip_address=None):
     return render(request, "deepweb/report_form.html", context)
 
 
-<<<<<<< HEAD
 def rechercher(request):
     print("fonction rechercher lancée")
-=======
+
+
 @login_required
 def list_user(request):
     """Liste utilisateurs"""
@@ -194,7 +187,6 @@ def list_user_update(request, pk):
 
 
 def rechercher(request):
->>>>>>> 1e90755596fdc22bc4c3a5332fc6fd4e842f15bc
     if request.method == "POST":
         print("méthode post détectée")
         form = SearchForm(request.POST)
@@ -203,16 +195,6 @@ def rechercher(request):
             resultat_recherche = form.cleaned_data["recherche"]
             if resultat_recherche:
                 results = IPAddress.objects.filter(address=resultat_recherche)
-<<<<<<< HEAD
-                print(lesIps.count())
-            else:
-                results = IPAddress.objects.none()
-                print("fonctionne pas")
-        else:
-            results = IPAddress.objects.all()
-
-    return render(request, "deepweb/index.html", {"form": form, "results": results})
-=======
             else:
 
                 results = IPAddress.objects.none()
@@ -224,4 +206,3 @@ def rechercher(request):
         "deepweb/index.html",
         {"form": form, "results": results, "reports": reports},
     )
->>>>>>> 1e90755596fdc22bc4c3a5332fc6fd4e842f15bc
