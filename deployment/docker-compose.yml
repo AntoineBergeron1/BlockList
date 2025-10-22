@@ -52,10 +52,10 @@ services:
       # REDIS_URL: redis://redis:6379/1
 
       # Email settings (optionnel)
-      EMAIL_HOST: ${EMAIL_HOST:-smtp.gmail.com}
-      EMAIL_PORT: ${EMAIL_PORT:-587}
-      EMAIL_HOST_USER: ${EMAIL_HOST_USER:-}
-      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:-}
+      # EMAIL_HOST: ${EMAIL_HOST:-smtp.gmail.com}
+      # EMAIL_PORT: ${EMAIL_PORT:-587}
+      # EMAIL_HOST_USER: ${EMAIL_HOST_USER:-}
+      # EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:-}
     ports:
       - "8000:8000"
     depends_on:
