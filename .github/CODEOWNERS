@@ -1,0 +1,11 @@
+# CODEOWNERS - Automatically request reviews for pull requests
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Source code
+/src/ @MaximeMichaud @ArianePaquet @AntoineBergeron1
+
+# Deployment configuration
+/deployment/ @MaximeMichaud
+
+# CI/CD workflows
+/.github/workflows/ @MaximeMichaud
