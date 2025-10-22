@@ -5,16 +5,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Plateforme d'activités" />
-    <title>
-      {% block title %}
-      {% endblock %}
-    </title>
+    <title>{% block title %} {% endblock %}</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet" />
+    <link
+      href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}"
+      rel="stylesheet"
+    />
 
     <!-- Ton CSS personnalisé -->
-    <link rel="stylesheet" href="{% static 'activities/styles/styles.css' %}" />
+    <!-- <link rel="stylesheet" href="{% static 'styles/styles.css' %}" /> -->
   </head>
 
   <body>
@@ -23,56 +23,97 @@
       <div class="container-fluid">
         <a class="navbar-brand" href="{% url 'index' %}">Blocklist</a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarContent"
+          aria-controls="navbarContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-        <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+        <div
+          class="collapse navbar-collapse justify-content-end"
+          id="navbarContent"
+        >
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
               <a class="nav-link" href="{% url 'report_ip' %}">Report IP</a>
             </li>
           </ul>
 
-        <div>
-       {% if user.is_authenticated %}
-            {% if user.is_staff %}
-              <a class="btn btn-primary" href="{% url 'list_user' %}">Utilisateurs</a>
+          <div>
+            {% if user.is_authenticated %} {% if user.is_staff %}
+            <a class="btn btn-primary" href="{% url 'list_user' %}"
+              >Utilisateurs</a
+            >
             {% endif %}
-            <a class="btn btn-primary" href="{% url 'deconnecter' %}">Se déconnecter</a>
-          {% else %}
-            <a class="btn btn-outline-light me-2" href="{% url 'connecter' %}">Se connecter</a>
-            <a class="btn btn-outline-light" href="{% url 'register' %}">Créer un compte</a>
-        {% endif %}
+            <a class="btn btn-primary" href="{% url 'deconnecter' %}"
+              >Se déconnecter</a
+            >
+            {% else %}
+            <a class="btn btn-outline-light me-2" href="{% url 'connecter' %}"
+              >Se connecter</a
+            >
+            <a class="btn btn-outline-light" href="{% url 'register' %}"
+              >Créer un compte</a
+            >
+            {% endif %}
+          </div>
 
-
-
-
-        </div>
-
-
-          <form class="d-flex me-3 " role="search">
-            <input class="form-control me-2" type="search" placeholder="Rechercher" aria-label="Search" />
-            <button class="btn btn-outline-light" type="submit"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-            </svg></button>
+          <form
+            class="d-flex me-3"
+            id="formRecherche"
+            role="search"
+            method="POST"
+          >
+            {% csrf_token %}
+            <input
+              class="form-control me-2"
+              type="search"
+              placeholder="Rechercher"
+              aria-label="Search"
+            />
+            <button class="btn btn-outline-light" type="submit">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                class="bi bi-search"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"
+                />
+              </svg>
+            </button>
           </form>
-
         </div>
-
       </div>
     </nav>
 
-
     <!-- Main content -->
     <main role="main" class="container py-5 mt-5">
-      {% block contenu %}
-
-      {% endblock %}
+      {% block contenu %} {% endblock %}
     </main>
 
     <footer class="">
       <div class="container text-center">
         <p>&copy; {{ year|default:'2025' }} BlockList — Tous droits réservés</p>
-        <p class="small text-muted">Version: <a href="https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/commit/{{ GIT_COMMIT_HASH }}" target="_blank" rel="noopener" class="text-muted">{{ GIT_COMMIT_HASH }}</a></p>
+        <p class="small text-muted">
+          Version:
+          <a
+            href="https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/commit/{{ GIT_COMMIT_HASH }}"
+            target="_blank"
+            rel="noopener"
+            class="text-muted"
+            >{{ GIT_COMMIT_HASH }}</a
+          >
+        </p>
       </div>
     </footer>
 

@@ -1,7 +1,7 @@
 import os
 import ipaddress
 from .models import User, IPAddress, Report
-from .forms import RegisterForm, LoginForm, ReportForm
+from .forms import RegisterForm, LoginForm, ReportForm, SearchForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
@@ -9,15 +9,25 @@ from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.db.models import Count, Min, Max
 from django.http import Http404
-from django.conf import settings  # TODO: Used for DEBUG in login view quick-login buttons
+from django.conf import (
+    settings,
+)  # TODO: Used for DEBUG in login view quick-login buttons
 
 utilisateurs = User.objects.all()
+lesIps = IPAddress.objects.all()
+reports = Report.objects.all()
 
 # Create your views here.
 
 
 def index(request):
-    return render(request, "deepweb/index.html")
+    form = SearchForm()
+    return render(
+        request,
+        "deepweb/index.html",
+        {"form": form, "results": IPAddress.objects.all(), "reports": reports},
+    )
+
 
 def register(request):
     if request.method == "POST":
@@ -35,7 +45,6 @@ def register(request):
         form = RegisterForm()
 
     return render(request, "deepweb/register.html", {"form": form})
-
 
 
 def connecter(request):
@@ -58,7 +67,9 @@ def connecter(request):
         form = LoginForm()
 
     # TODO: Remove 'debug' context when removing quick-login development buttons
-    return render(request, "deepweb/login.html", {"form": form, "debug": settings.DEBUG})
+    return render(
+        request, "deepweb/login.html", {"form": form, "debug": settings.DEBUG}
+    )
 
 
 def deconnecter(request):
@@ -128,7 +139,7 @@ def report_ip(request, ip_address=None):
 
             messages.success(
                 request,
-                f"Signalement enregistré avec succès pour l'IP {report.ip_address.address}!"
+                f"Signalement enregistré avec succès pour l'IP {report.ip_address.address}!",
             )
             return redirect("ip_detail", ip_address=report.ip_address.address)
         else:
@@ -143,6 +154,11 @@ def report_ip(request, ip_address=None):
 
     return render(request, "deepweb/report_form.html", context)
 
+
+def rechercher(request):
+    print("fonction rechercher lancée")
+
+
 @login_required
 def list_user(request):
     """Liste utilisateurs"""
@@ -152,17 +168,38 @@ def list_user(request):
     if not request.user.is_staff:
         return render(request, "deepweb/403.html")
 
-    return render(request, "deepweb/list_user.html", {'utilisateurs':utilisateurs, 'user':user})
+    return render(
+        request, "deepweb/list_user.html", {"utilisateurs": utilisateurs, "user": user}
+    )
+
 
 @login_required
 def list_user_update(request, pk):
     """Liste utilisateurs mise a jour"""
-    utilisateur = get_object_or_404(User,id=pk)
+    utilisateur = get_object_or_404(User, id=pk)
 
     if request.method == "POST":
         utilisateur.is_staff = "is_staff" in request.POST
         utilisateur.is_active = "is_active" in request.POST
         utilisateur.save()
 
+    return redirect("list_user")
 
-    return redirect('list_user')
+
+def rechercher(request):
+    if request.method == "POST":
+        form = SearchForm(request.POST)
+        if form.is_valid():
+            resultat_recherche = form.cleaned_data["recherche"]
+            if resultat_recherche:
+                results = IPAddress.objects.filter(address=resultat_recherche)
+            else:
+                results = IPAddress.objects.none()
+        else:
+            results = IPAddress.objects.all()
+
+    return render(
+        request,
+        "deepweb/index.html",
+        {"form": form, "results": results, "reports": reports},
+    )
