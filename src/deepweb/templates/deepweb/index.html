@@ -25,19 +25,19 @@
 
     <h2>Dernière ip reportées :</h2>
     <div class="row">
-        {% for signalement in signalements %}
+        {% for report in reports %}
             <div class="col-sm-6">
                 <div class="card m-2">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h3 class="card-title"><a href="{% url 'ip_detail' signalement.ip_address %}">{{signalement.ip_address}}</a></h3>
-                            <p class="badge bg-warning">{{signalement.reason}}</p>
+                            <h3 class="card-title"><a href="{% url 'ip_detail' report.ip_address %}">{{report.ip_address}}</a></h3>
+                            <p class="badge bg-warning">{{report.reason}}</p>
                         </div>
-                        {% if signalement.comment %}
-                            <p class="card-text">Commentaire : {{signalement.comment}}</p>
+                        {% if report.comment %}
+                            <p class="card-text">Commentaire : {{report.comment}}</p>
                         {% endif %}
-                        <p>Signalé par : {{signalement.user}}</p>
-                        <p class="small mb-3">{{signalement.created_at|date:"d/m/Y"}}</p>
+                        <p>Signalé par : {{report.user}}</p>
+                        <p class="small mb-3">{{report.created_at|date:"d/m/Y"}}</p>
                     </div>
                 </div>
             </div>
