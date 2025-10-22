@@ -18,9 +18,9 @@ utilisateurs = User.objects.all()
 
 def index(request):
     """Voir les dernières ip reportées sur la page accueil"""
-    reports = Report.objects.all()
+    recent_reports = Report.objects.all().order_by("created_at")[:9]
 
-    return render(request, "deepweb/index.html", {"reports":reports})
+    return render(request, "deepweb/index.html", {"recent_reports":recent_reports})
 
 def register(request):
     if request.method == "POST":
