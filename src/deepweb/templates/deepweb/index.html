@@ -33,11 +33,6 @@
                             <h3 class="card-title"><a href="{% url 'ip_detail' report.ip_address %}">{{report.ip_address}}</a></h3>
                             <p class="badge bg-warning">{{report.reason}}</p>
                         </div>
-                        {% if report.comment %}
-                            <p class="card-text">Commentaire : {{report.comment}}</p>
-                        {% endif %}
-                        <p>Signalé par : {{report.user}}</p>
-                        <p class="small mb-3">{{report.created_at|date:"d/m/Y"}}</p>
                     </div>
                 </div>
             </div>
