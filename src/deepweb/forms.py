@@ -209,11 +209,14 @@ class ReportForm(forms.ModelForm):
         return ip_input
 
 
-class SearchForm(forms.Form):
+class SearchForm(forms.ModelForm):
     recherche = forms.CharField(
         max_length=100,
         min_length=3,
         required=True,
+        error_messages={
+            "invalid": "Adresse IP : Le format de l'adresse IP ne correspond pas à un IPV4 ou IPV6 valide.",
+        },
         widget=forms.TextInput(
             attrs={
                 "class": "form-control ",
@@ -223,3 +226,24 @@ class SearchForm(forms.Form):
         ),
         label="",
     )
+
+    class Meta:
+        model = IPAddress
+        fields = ["recherche"]
+
+    def init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs["class"] = "form-control"
+
+    def clean_ip_address(self):
+        """
+        Validate and get or create IP address.
+        """
+        ip_input = self.cleaned_data.get("recherche")
+        try:
+            results = IPAddress.objects.filter(address=ip_input)
+        except Exception as e:
+            raise forms.ValidationError(f"Adresse IP invalide : {e}")
+
+        return ip_input

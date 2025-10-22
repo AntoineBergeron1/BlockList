@@ -14,6 +14,7 @@ from django.conf import (
 )  # TODO: Used for DEBUG in login view quick-login buttons
 
 utilisateurs = User.objects.all()
+lesIps = IPAddress.objects.all()
 reports = Report.objects.all()
 
 # Create your views here.
@@ -154,6 +155,10 @@ def report_ip(request, ip_address=None):
     return render(request, "deepweb/report_form.html", context)
 
 
+def rechercher(request):
+    print("fonction rechercher lancée")
+
+
 @login_required
 def list_user(request):
     """Liste utilisateurs"""
@@ -183,15 +188,12 @@ def list_user_update(request, pk):
 
 def rechercher(request):
     if request.method == "POST":
-        print("méthode post détectée")
         form = SearchForm(request.POST)
         if form.is_valid():
-            print("formulaire valide")
             resultat_recherche = form.cleaned_data["recherche"]
             if resultat_recherche:
                 results = IPAddress.objects.filter(address=resultat_recherche)
             else:
-
                 results = IPAddress.objects.none()
         else:
             results = IPAddress.objects.all()
