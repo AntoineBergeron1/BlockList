@@ -15,9 +15,11 @@
 {% endif %}
 
 <h1>BlockList</h1>
+<p>Bienvenue sur <strong>BlockList</strong>, un site qui vous permet de consulter si une adresse IP
+  a été signalée pour activité suspecte et d'en consulter l'historique</p>
 
 <section>
-    <h2>Les adresses IP</h2>
+    <h2>Recherche IP</h2>
 
   <form
     method="POST"
@@ -59,7 +61,7 @@
 </section>
 
 <section>
-<h2>Dernière ip reportées :</h2>
+<h2>Dernières IP reportées :</h2>
     <div class="row">
         {% for report in recent_reports %}
             <div class="col-sm-4">
