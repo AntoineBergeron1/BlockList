@@ -215,3 +215,17 @@ class SearchForm(forms.Form):
             "invalid": "Adresse IP : Le format de l'adresse IP ne correspond pas à un IPV4 ou IPV6 valide.",
         },
     )
+
+    choix = forms.ChoiceField(
+        choices=[
+            ("creationCroissant ", "Date de création (Croissant)"),
+            ("creationDecroissant", "Date de création (Décroissant)"),
+            ("modificationCroissant", "Date de modification (Croissant)"),
+            ("modificationDecroissant", "Date de modification (Décroissant)"),
+            ("reputationCroissant", "Réputation (Croissant)"),
+            ("reputationDecroissant", "Réputation (Décroissant)"),
+        ],
+        label="Trier par : ",
+        widget=forms.Select(attrs={"class": "form-control"}),
+        required=False,
+    )

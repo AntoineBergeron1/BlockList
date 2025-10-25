@@ -155,10 +155,6 @@ def report_ip(request, ip_address=None):
     return render(request, "deepweb/report_form.html", context)
 
 
-def rechercher(request):
-    print("fonction rechercher lancée")
-
-
 @login_required
 def list_user(request):
     """Liste utilisateurs"""
@@ -203,3 +199,18 @@ def rechercher(request):
         "deepweb/index.html",
         {"form": form, "results": results, "reports": reports},
     )
+
+    if request.method == "POST":
+        form = FiltresForm(request.POST)
+        if form.is_valid():
+            choix_filtre = form.cleaned_data["choix"]
+            if choix_filtre == "most_reported":
+                results = IPAddress.objects.annotate(
+                    report_count=Count("reports")
+                ).order_by("-report_count")
+            elif choix_filtre == "least_reported":
+                results = IPAddress.objects.annotate(
+                    report_count=Count("reports")
+                ).order_by("report_count")
+            else:
+                results = IPAddress.objects.all()
