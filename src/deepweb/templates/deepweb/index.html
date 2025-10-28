@@ -14,8 +14,12 @@
 </div>
 {% endif %}
 
+<h1>BlockList</h1>
+<p><strong>BlockList</strong>, un site qui vous permet de consulter si une adresse IP
+  a été signalée pour activité suspecte, d'en consulter l'historique et de signaler des adresses IP</p>
+
 <section>
-    <h2>Les adresses IP</h2>
+    <h2>Recherche IP</h2>
 
   <form
     method="POST"
@@ -56,4 +60,21 @@
   </ul>
 </section>
 
+<section>
+<h2>Dernières IP reportées :</h2>
+    <div class="row">
+        {% for report in recent_reports %}
+            <div class="col-sm-4">
+                <div class="card m-2">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h3 class="card-title"><a href="{% url 'ip_detail' report.ip_address %}">{{report.ip_address}}</a></h3>
+                            <p class="badge bg-warning">{{report.reason}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
 {% endblock %}

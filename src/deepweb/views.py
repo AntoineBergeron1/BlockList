@@ -21,11 +21,14 @@ reports = Report.objects.all()
 
 
 def index(request):
+    """Voir les dernières ip reportées sur la page accueil"""
+    recent_reports = Report.objects.all().order_by("created_at")[:9]
+
     form = SearchForm()
     return render(
         request,
         "deepweb/index.html",
-        {"form": form, "results": IPAddress.objects.all(), "reports": reports},
+        {"form": form, "results": IPAddress.objects.all(), "reports": reports, "recent_reports":recent_reports},
     )
 
 
