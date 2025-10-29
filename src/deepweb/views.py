@@ -1,17 +1,19 @@
-import os
 import ipaddress
-from .models import User, IPAddress, Report
-from .forms import RegisterForm, LoginForm, ReportForm, SearchForm
-from django.shortcuts import render, redirect, get_object_or_404
+import os
+
+from django.conf import (  # TODO: Used for DEBUG in login view quick-login buttons
+    settings,
+)
 from django.contrib import messages
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
-from django.db.models import Count, Min, Max
-from django.http import Http404
-from django.conf import (
-    settings,
-)  # TODO: Used for DEBUG in login view quick-login buttons
+from django.db.models import Count, Max, Min
+from django.http import Http404, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+
+from .forms import LoginForm, RegisterForm, ReportForm, SearchForm
+from .models import IPAddress, Report, User
 
 utilisateurs = User.objects.all()
 lesIps = IPAddress.objects.all()
@@ -21,11 +23,14 @@ reports = Report.objects.all()
 
 
 def index(request):
+    """Voir les dernières ip reportées sur la page accueil"""
+    recent_reports = Report.objects.all().order_by("created_at")[:9]
+
     form = SearchForm()
     return render(
         request,
         "deepweb/index.html",
-        {"form": form, "results": IPAddress.objects.all(), "reports": reports},
+        {"form": form, "results": IPAddress.objects.all(), "reports": reports, "recent_reports":recent_reports},
     )
 
 
@@ -220,17 +225,73 @@ def rechercher(request):
         {"form": form, "results": results, "reports": reports},
     )
 
-    if request.method == "POST":
-        form = FiltresForm(request.POST)
-        if form.is_valid():
-            choix_filtre = form.cleaned_data["choix"]
-            if choix_filtre == "most_reported":
-                results = IPAddress.objects.annotate(
-                    report_count=Count("reports")
-                ).order_by("-report_count")
-            elif choix_filtre == "least_reported":
-                results = IPAddress.objects.annotate(
-                    report_count=Count("reports")
-                ).order_by("report_count")
-            else:
-                results = IPAddress.objects.all()
+
+def ip_chart_data(request, ip_address):
+    """
+    API endpoint for chart data.
+    Returns JSON data for Chart.js with timeline, threat types, and users.
+    """
+    try:
+        ipaddress.ip_address(ip_address)
+    except ValueError:
+        return JsonResponse({"error": "Invalid IP address"}, status=400)
+
+    try:
+        ip_obj = IPAddress.objects.get(address=ip_address)
+    except IPAddress.DoesNotExist:
+        return JsonResponse({"error": "IP not found"}, status=404)
+
+    reports = ip_obj.reports.select_related("user").order_by("created_at")
+
+    if not reports.exists():
+        return JsonResponse(
+            {
+                "timeline": {"labels": [], "data": []},
+                "threatTypes": {"labels": [], "data": []},
+                "topUsers": {"labels": [], "data": []},
+            }
+        )
+
+    # Timeline data - group by day
+    timeline_data = {}
+    for report in reports:
+        date_str = report.created_at.strftime("%Y-%m-%d")
+        timeline_data[date_str] = timeline_data.get(date_str, 0) + 1
+
+    # Sort by date
+    sorted_dates = sorted(timeline_data.keys())
+    timeline = {
+        "labels": sorted_dates,
+        "data": [timeline_data[date] for date in sorted_dates],
+    }
+
+    # Threat types distribution
+    threat_counts = (
+        reports.values("reason").annotate(count=Count("id")).order_by("-count")
+    )
+    threat_types = {
+        "labels": [
+            dict(Report.REASON_CHOICES).get(item["reason"], item["reason"])
+            for item in threat_counts
+        ],
+        "data": [item["count"] for item in threat_counts],
+    }
+
+    # Top 5 users
+    user_counts = (
+        reports.values("user__username")
+        .annotate(count=Count("id"))
+        .order_by("-count")[:5]
+    )
+    top_users = {
+        "labels": [item["user__username"] for item in user_counts],
+        "data": [item["count"] for item in user_counts],
+    }
+
+    response_data = {
+        "timeline": timeline,
+        "threatTypes": threat_types,
+        "topUsers": top_users,
+    }
+
+    return JsonResponse(response_data)
