@@ -24,7 +24,7 @@ reports = Report.objects.all()
 
 def index(request):
     """Voir les dernières ip reportées sur la page accueil"""
-    recent_reports = Report.objects.all().order_by("created_at")[:9]
+    recent_reports = Report.objects.all().order_by("-created_at")[:9]
 
     form = SearchForm()
     return render(
@@ -194,7 +194,7 @@ def list_user_update(request, pk):
 
 def rechercher(request):
     if request.method == "POST":
-        recent_reports = Report.objects.all().order_by("created_at")[:9]
+        recent_reports = Report.objects.all().order_by("-created_at")[:9]
 
         form = SearchForm(request.POST)
         if form.is_valid():
