@@ -3,26 +3,31 @@
 {% block contenu %}
 
 <h1>Utilisateurs</h1>
-{% for util in utilisateurs %}
-<div class="card m-3">
-    <div class="card-body">
-        <form method="POST" novalidate action="{% url 'list_user_update' util.pk %}">
-            {% csrf_token %}
-            <h5 class="card-title">{{util.username}}</h5>
-            <div class="d-flex justify-content-between">
-                <p class="card-text">Prénom : {{util.first_name}}</p>
-                <p class="card-text">Nom : {{util.last_name}}</p>
-                <p class="card-text">
-                    Est Staff : <input type="checkbox" name="is_staff" value={{util.is_staff}} {% if util.is_staff %} checked {% endif %} {% if util.username == user.username %} readonly disabled {% endif %}>
-                </p>
-                <p class="card-text">
-                    Est Actif : <input type="checkbox" name="is_active" value={{util.is_active}} {% if util.is_active %} checked {% endif %} {% if util.username == user.username %} readonly disabled {% endif %}>
-                </p>
 
-                <button class="btn btn-primary">Sauvegarder</button>
-            </div>
-        </form>
-    </div>
-</div>
-{% endfor %}
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Utilisateurs</th>
+      <th scope="col">Prénom</th>
+      <th scope="col">Nom</th>
+      <th scope="col">Est staff</th>
+      <th scope="col">Est actif</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for util in utilisateurs %}
+    <form method="POST" novalidate action="{% url 'list_user_update' util.pk %}">
+        {% csrf_token %}
+    <tr>
+      <th scope="row">{{util.username}}</th>
+      <td>{{util.first_name}}</td>
+      <td>{{util.last_name}}</td>
+      <td><input type="checkbox" name="is_staff" value={{util.is_staff}} {% if util.is_staff %} checked {% endif %} {% if util.username == user.username %} readonly disabled {% endif %}></td>
+      <td><input type="checkbox" name="is_active" value={{util.is_active}} {% if util.is_active %} checked {% endif %} {% if util.username == user.username %} readonly disabled {% endif %}></td>
+      <td><button class="btn btn-primary" {% if util.username == user.username %} readonly disabled {% endif %}>Sauvegarder</button></td>
+    </tr>
+    </form>
+    {% endfor %}
+  </tbody>
+</table>
 {% endblock %}

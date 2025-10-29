@@ -169,7 +169,7 @@ def report_ip(request, ip_address=None):
 def list_user(request):
     """Liste utilisateurs"""
     user = request.user
-    utilisateurs = User.objects.all()
+    utilisateurs = User.objects.all().order_by("username")
 
     if not request.user.is_staff:
         return render(request, "deepweb/403.html")
