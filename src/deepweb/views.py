@@ -1,17 +1,19 @@
-import os
 import ipaddress
-from .models import User, IPAddress, Report
-from .forms import RegisterForm, LoginForm, ReportForm, SearchForm
-from django.shortcuts import render, redirect, get_object_or_404
+import os
+
+from django.conf import (  # TODO: Used for DEBUG in login view quick-login buttons
+    settings,
+)
 from django.contrib import messages
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
-from django.db.models import Count, Min, Max
-from django.http import Http404
-from django.conf import (
-    settings,
-)  # TODO: Used for DEBUG in login view quick-login buttons
+from django.db.models import Count, Max, Min
+from django.http import Http404, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+
+from .forms import LoginForm, RegisterForm, ReportForm, SearchForm
+from .models import IPAddress, Report, User
 
 utilisateurs = User.objects.all()
 lesIps = IPAddress.objects.all()
@@ -158,10 +160,6 @@ def report_ip(request, ip_address=None):
     return render(request, "deepweb/report_form.html", context)
 
 
-def rechercher(request):
-    print("fonction rechercher lancée")
-
-
 @login_required
 def list_user(request):
     """Liste utilisateurs"""
@@ -194,10 +192,30 @@ def rechercher(request):
         form = SearchForm(request.POST)
         if form.is_valid():
             resultat_recherche = form.cleaned_data["recherche"]
+            optiontri = form.cleaned_data.get("tries")
             if resultat_recherche:
                 results = IPAddress.objects.filter(address=resultat_recherche)
             else:
+                results = IPAddress.objects.all()
+
+            if optiontri == "reputationCroissant":
+                results = results.order_by("reputation_score")
+            elif optiontri == "reputationDecroissant":
+                results = results.order_by("-reputation_score")
+            elif optiontri == "creationCroissant":
+                results = results.order_by("created_at")
+            elif optiontri == "creationDecroissant":
+                results = results.order_by("-created_at")
+            elif optiontri == "modificationCroissant":
+                results = results.order_by("updated_at")
+            elif optiontri == "modificationDecroissant":
+                results = results.order_by("-updated_at")
+            elif optiontri == "default":
+                results = results
+
+            else:
                 results = IPAddress.objects.none()
+
         else:
             results = IPAddress.objects.all()
 
@@ -206,3 +224,74 @@ def rechercher(request):
         "deepweb/index.html",
         {"form": form, "results": results, "reports": reports},
     )
+
+
+def ip_chart_data(request, ip_address):
+    """
+    API endpoint for chart data.
+    Returns JSON data for Chart.js with timeline, threat types, and users.
+    """
+    try:
+        ipaddress.ip_address(ip_address)
+    except ValueError:
+        return JsonResponse({"error": "Invalid IP address"}, status=400)
+
+    try:
+        ip_obj = IPAddress.objects.get(address=ip_address)
+    except IPAddress.DoesNotExist:
+        return JsonResponse({"error": "IP not found"}, status=404)
+
+    reports = ip_obj.reports.select_related("user").order_by("created_at")
+
+    if not reports.exists():
+        return JsonResponse(
+            {
+                "timeline": {"labels": [], "data": []},
+                "threatTypes": {"labels": [], "data": []},
+                "topUsers": {"labels": [], "data": []},
+            }
+        )
+
+    # Timeline data - group by day
+    timeline_data = {}
+    for report in reports:
+        date_str = report.created_at.strftime("%Y-%m-%d")
+        timeline_data[date_str] = timeline_data.get(date_str, 0) + 1
+
+    # Sort by date
+    sorted_dates = sorted(timeline_data.keys())
+    timeline = {
+        "labels": sorted_dates,
+        "data": [timeline_data[date] for date in sorted_dates],
+    }
+
+    # Threat types distribution
+    threat_counts = (
+        reports.values("reason").annotate(count=Count("id")).order_by("-count")
+    )
+    threat_types = {
+        "labels": [
+            dict(Report.REASON_CHOICES).get(item["reason"], item["reason"])
+            for item in threat_counts
+        ],
+        "data": [item["count"] for item in threat_counts],
+    }
+
+    # Top 5 users
+    user_counts = (
+        reports.values("user__username")
+        .annotate(count=Count("id"))
+        .order_by("-count")[:5]
+    )
+    top_users = {
+        "labels": [item["user__username"] for item in user_counts],
+        "data": [item["count"] for item in user_counts],
+    }
+
+    response_data = {
+        "timeline": timeline,
+        "threatTypes": threat_types,
+        "topUsers": top_users,
+    }
+
+    return JsonResponse(response_data)

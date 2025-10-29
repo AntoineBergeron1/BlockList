@@ -51,7 +51,10 @@
     <li>
       <div class="card">
         <div class="card-body">
-          <h4 class="card-title"> Adresse Ip : {{ ip.address }}</h2>
+          <h4 class="card-title"> Adresse Ip : {{ip.address}}</h4>
+          <a class="btn btn-primary" href="{% url 'ip_detail' ip.address %}">Voir plus</a>
+
+
      </div>
     </li>
     {% empty %}
