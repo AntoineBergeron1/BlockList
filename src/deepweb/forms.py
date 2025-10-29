@@ -220,7 +220,7 @@ class SearchForm(forms.Form):
     tries = forms.ChoiceField(
         choices=[
             ("default", "Trier par : (Défaut)"),
-            ("creationCroissant ", "Date de création (Croissant)"),
+            ("creationCroissant", "Date de création (Croissant)"),
             ("creationDecroissant", "Date de création (Décroissant)"),
             ("modificationCroissant", "Date de modification (Croissant)"),
             ("modificationDecroissant", "Date de modification (Décroissant)"),

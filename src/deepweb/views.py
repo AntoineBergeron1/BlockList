@@ -30,7 +30,12 @@ def index(request):
     return render(
         request,
         "deepweb/index.html",
-        {"form": form, "results": IPAddress.objects.all(), "reports": reports, "recent_reports":recent_reports},
+        {
+            "form": form,
+            "results": IPAddress.objects.all(),
+            "reports": reports,
+            "recent_reports": recent_reports,
+        },
     )
 
 
