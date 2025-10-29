@@ -210,11 +210,15 @@ class ReportForm(forms.ModelForm):
 
 
 class SearchForm(forms.Form):
-    recherche = forms.GenericIPAddressField(
-        error_messages={
-            "invalid": "Adresse IP : Le format de l'adresse IP ne correspond pas à un IPV4 ou IPV6 valide.",
-        },
+    recherche = forms.CharField(
+        label="",
         required=False,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Entrez une adresse IP...",
+            }
+        ),
     )
 
     tries = forms.ChoiceField(
