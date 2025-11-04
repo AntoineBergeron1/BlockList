@@ -30,7 +30,12 @@ def index(request):
     return render(
         request,
         "deepweb/index.html",
-        {"form": form, "results": IPAddress.objects.all(), "reports": reports, "recent_reports":recent_reports},
+        {
+            "form": form,
+            "results": IPAddress.objects.all(),
+            "reports": reports,
+            "recent_reports": recent_reports,
+        },
     )
 
 
@@ -189,6 +194,8 @@ def list_user_update(request, pk):
 
 def rechercher(request):
     if request.method == "POST":
+        recent_reports = Report.objects.all().order_by("created_at")[:9]
+
         form = SearchForm(request.POST)
         if form.is_valid():
             resultat_recherche = form.cleaned_data["recherche"]
@@ -199,9 +206,9 @@ def rechercher(request):
                 results = IPAddress.objects.all()
 
             if optiontri == "reputationCroissant":
-                results = results.order_by("reputation_score")
-            elif optiontri == "reputationDecroissant":
                 results = results.order_by("-reputation_score")
+            elif optiontri == "reputationDecroissant":
+                results = results.order_by("reputation_score")
             elif optiontri == "creationCroissant":
                 results = results.order_by("created_at")
             elif optiontri == "creationDecroissant":
@@ -222,7 +229,8 @@ def rechercher(request):
     return render(
         request,
         "deepweb/index.html",
-        {"form": form, "results": results, "reports": reports},
+        {"form": form, "results": results, "reports": reports, "recent_reports": recent_reports,
+},
     )
 
 
