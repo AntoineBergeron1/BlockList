@@ -50,9 +50,14 @@
     {% for ip in results %}
     <li>
       <div class="card">
-        <div class="card-body">
-          <h4 class="card-title"> Adresse Ip : {{ip.address}}</h4>
-          <a class="btn btn-primary" href="{% url 'ip_detail' ip.address %}">Voir plus</a>
+        <div class="card-body ">
+        <div class="d-flex justify-content-around" >
+            <h4><a href="{% url 'ip_detail' ip.address %}" class="text-decoration-none">IPV{{ip.version}} : {{ip.address}}</a></h4>
+            <p>Note {{ip.reputation_score}}/100</p>
+            <p>Création : {{ip.created_at.year}}-{{ip.created_at.month}}-{{ip.created_at.day}}</p>
+
+        </div>
+
 
 
      </div>
