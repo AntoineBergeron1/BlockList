@@ -201,7 +201,10 @@ def rechercher(request):
             resultat_recherche = form.cleaned_data["recherche"]
             optiontri = form.cleaned_data.get("tries")
             if resultat_recherche:
-                results = IPAddress.objects.filter(address=resultat_recherche)
+                results = []
+                for ip in IPAddress.objects.all():
+                    if resultat_recherche in ip.address:
+                        results.append(ip)
             else:
                 results = IPAddress.objects.all()
 
@@ -229,8 +232,12 @@ def rechercher(request):
     return render(
         request,
         "deepweb/index.html",
-        {"form": form, "results": results, "reports": reports, "recent_reports": recent_reports,
-},
+        {
+            "form": form,
+            "results": results,
+            "reports": reports,
+            "recent_reports": recent_reports,
+        },
     )
 
 
