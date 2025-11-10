@@ -1,11 +1,13 @@
-# CODEOWNERS - Automatically request reviews for pull requests
+# CODEOWNERS file for 420-18D-FX project
 # https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
-# Source code
-/src/ @MaximeMichaud @ArianePaquet @AntoineBergeron1
+# Default owners for everything
+* @MaximeMichaud @AntoineBergeron1 @ArianePaquet
 
-# Deployment configuration
-/deployment/ @MaximeMichaud
-
-# CI/CD workflows
-/.github/workflows/ @MaximeMichaud
+# Dependencies and CI/CD - managed by MaximeMichaud only
+src/requirements.txt @MaximeMichaud
+src/package.json @MaximeMichaud
+src/package-lock.json @MaximeMichaud
+.pre-commit-config.yaml @MaximeMichaud
+.github/dependabot.yml @MaximeMichaud
+.github/workflows/pre-commit-autoupdate.yml @MaximeMichaud
