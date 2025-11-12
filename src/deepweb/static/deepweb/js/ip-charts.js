@@ -250,12 +250,16 @@ class IPChartManager {
       }
 
       const newData = await response.json();
+      const oldDataStr = JSON.stringify(this.chartData);
+      const newDataStr = JSON.stringify(newData);
 
-      if (JSON.stringify(newData) !== JSON.stringify(this.chartData)) {
+      if (oldDataStr !== newDataStr) {
         this.chartData = newData;
         if (this.chart) {
-          this.chart.data = this.getChartDataForView(this.currentView);
-          this.chart.update('none');
+          const newChartData = this.getChartDataForView(this.currentView);
+          this.chart.data.labels = newChartData.labels;
+          this.chart.data.datasets = newChartData.datasets;
+          this.chart.update();
         }
       }
     } catch (error) {
