@@ -19,7 +19,11 @@
     <form method="POST" novalidate action="{% url 'list_user_update' util.pk %}">
         {% csrf_token %}
     <tr>
-      <th scope="row">{{util.username}}</th>
+      <th scope="row">
+        <a class="text-decoration-none" href="{% url 'profile_public_user' util.pk %}">
+          {{util.username}}
+        </a>
+      </th>
       <td>{{util.first_name}}</td>
       <td>{{util.last_name}}</td>
       <td><input type="checkbox" name="is_staff" value={{util.is_staff}} {% if util.is_staff %} checked {% endif %} {% if util.username == user.username %} readonly disabled {% endif %}></td>
