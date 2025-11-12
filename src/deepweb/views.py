@@ -187,6 +187,11 @@ def ip_reports_api(request, ip_address):
                 "first_report_date": first_date.strftime("%d/%m/%Y") if first_date else "N/A",
                 "last_report_date": last_date.strftime("%d/%m/%Y") if last_date else "N/A",
             },
+            "ip_info": {
+                "reputation_score": ip_obj.reputation_score,
+                "created_at": ip_obj.created_at.strftime("%d/%m/%Y %H:%M"),
+                "updated_at": ip_obj.updated_at.strftime("%d/%m/%Y %H:%M"),
+            },
         }
     )
 
