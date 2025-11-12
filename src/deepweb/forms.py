@@ -216,6 +216,7 @@ class SearchForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 "class": "form-control",
+                "class": "m-1",
                 "placeholder": "Entrez une adresse IP...",
             }
         ),
@@ -232,6 +233,16 @@ class SearchForm(forms.Form):
             ("reputationDecroissant", "Réputation (Décroissant)"),
         ],
         label="",
-        widget=forms.Select(attrs={"class": "form-control"}),
+        widget=forms.Select(attrs={"class": "form-control", "class": "m-1"}),
+        required=False,
+    )
+
+    filtres = forms.ChoiceField(
+        choices=[
+            ("4", "IPV4"),
+            ("6", "IPV6"),
+        ],
+        label="",
+        widget=forms.RadioSelect(attrs={"class": "m-1"}),
         required=False,
     )
