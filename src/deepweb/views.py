@@ -172,11 +172,21 @@ def ip_reports_api(request, ip_address):
         for report in reports
     ]
 
+    all_reports = ip_obj.reports.all()
+    total_count = all_reports.count()
+    first_date = all_reports.aggregate(Min("created_at"))["created_at__min"]
+    last_date = all_reports.aggregate(Max("created_at"))["created_at__max"]
+
     return JsonResponse(
         {
             "reports": reports_data,
             "count": len(reports_data),
             "latest_id": reports_data[0]["id"] if reports_data else None,
+            "statistics": {
+                "total_reports": total_count,
+                "first_report_date": first_date.strftime("%d/%m/%Y") if first_date else "N/A",
+                "last_report_date": last_date.strftime("%d/%m/%Y") if last_date else "N/A",
+            },
         }
     )
 

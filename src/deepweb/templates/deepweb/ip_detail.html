@@ -85,20 +85,20 @@
         <div class="row text-center">
           <div class="col-md-4">
             <div class="stat-item">
-              <h3 class="text-primary">{{ total_reports }}</h3>
+              <h3 class="text-primary" id="total-reports-count">{{ total_reports }}</h3>
               <p class="text-muted">Total des signalements</p>
             </div>
           </div>
           <div class="col-md-4">
             <div class="stat-item">
               <p class="text-muted mb-0">Premier signalement</p>
-              <p class="fw-bold">{{ first_report_date|date:"d/m/Y"|default:"N/A" }}</p>
+              <p class="fw-bold" id="first-report-date">{{ first_report_date|date:"d/m/Y"|default:"N/A" }}</p>
             </div>
           </div>
           <div class="col-md-4">
             <div class="stat-item">
               <p class="text-muted mb-0">Dernier signalement</p>
-              <p class="fw-bold">{{ last_report_date|date:"d/m/Y"|default:"N/A" }}</p>
+              <p class="fw-bold" id="last-report-date">{{ last_report_date|date:"d/m/Y"|default:"N/A" }}</p>
             </div>
           </div>
         </div>
@@ -254,21 +254,28 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize latest ID
   latestReportId = getLatestReportId();
 
-  // Function to add new report rows to the table
+  function updateStatistics(statistics) {
+    const totalCount = document.getElementById('total-reports-count');
+    const firstDate = document.getElementById('first-report-date');
+    const lastDate = document.getElementById('last-report-date');
+
+    if (totalCount) totalCount.textContent = statistics.total_reports;
+    if (firstDate) firstDate.textContent = statistics.first_report_date;
+    if (lastDate) lastDate.textContent = statistics.last_report_date;
+  }
+
   function addNewReports(reports) {
     if (reports.length === 0) return;
 
-    // Show live indicator briefly
     liveIndicator.style.display = 'block';
     setTimeout(() => {
       liveIndicator.style.display = 'none';
     }, 2000);
 
-    // Add new rows at the top with animation
     reports.reverse().forEach(report => {
       const newRow = document.createElement('tr');
       newRow.dataset.reportId = report.id;
-      newRow.className = 'table-success'; // Highlight new rows
+      newRow.className = 'table-success';
       newRow.innerHTML = `
         <td>
           <a href="#" class="text-decoration-none">
@@ -294,13 +301,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
       reportsTbody.insertBefore(newRow, reportsTbody.firstChild);
 
-      // Remove highlight after 3 seconds
       setTimeout(() => {
         newRow.classList.remove('table-success');
       }, 3000);
     });
 
-    // Update latest ID
     latestReportId = reports[reports.length - 1].id;
   }
 
@@ -318,6 +323,10 @@ document.addEventListener('DOMContentLoaded', function() {
       }
 
       const data = await response.json();
+
+      if (data.statistics) {
+        updateStatistics(data.statistics);
+      }
 
       if (data.count > 0) {
         addNewReports(data.reports);
