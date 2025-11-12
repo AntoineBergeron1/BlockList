@@ -1,10 +1,13 @@
-from django.db import models
-from django.contrib.auth.models import AbstractUser
-from django.core.validators import MinLengthValidator, MaxLengthValidator
-from django.core.exceptions import ValidationError
 import ipaddress
+import socket
+
+from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
+from django.core.validators import MaxLengthValidator, MinLengthValidator
+from django.db import models
 
 # Create your models here.
+
 
 class User(AbstractUser):
     avatar = models.ImageField(upload_to="avatars/")
@@ -28,6 +31,7 @@ class IPAddress(models.Model):
     Model representing an individual IP address (IPv4 or IPv6) with reputation tracking.
     GenericIPAddressField automatically uses PostgreSQL INET type for native IP operations.
     """
+
     IPV4 = 4
     IPV6 = 6
     IP_VERSION_CHOICES = [
@@ -37,8 +41,15 @@ class IPAddress(models.Model):
 
     address = models.GenericIPAddressField(unique=True, verbose_name="Adresse IP")
     version = models.IntegerField(choices=IP_VERSION_CHOICES, verbose_name="Version")
-    reputation_score = models.IntegerField(default=100, verbose_name="Score de réputation")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
+    hostname = models.CharField(
+        max_length=255, blank=True, null=True, verbose_name="Nom de domaine"
+    )
+    reputation_score = models.IntegerField(
+        default=100, verbose_name="Score de réputation"
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name="Date de création"
+    )
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Date de mise à jour")
 
     class Meta:
@@ -91,11 +102,29 @@ class IPAddress(models.Model):
         self.save()
         return self.reputation_score
 
+    def lookup_hostname(self):
+        """
+        Perform reverse DNS lookup to retrieve hostname for this IP address.
+        Returns the hostname if found, None otherwise.
+        Updates the hostname field and saves the instance.
+        """
+        try:
+            hostname, _, _ = socket.gethostbyaddr(str(self.address))
+            self.hostname = hostname
+            self.save(update_fields=["hostname"])
+            return hostname
+        except (socket.herror, socket.gaierror, socket.timeout):
+            # No reverse DNS record found or lookup failed
+            self.hostname = None
+            self.save(update_fields=["hostname"])
+            return None
+
 
 class Report(models.Model):
     """
     Model representing a report/signalement for an IP address.
     """
+
     # Temporary reason choices (will be refined later)
     SPAM = "SPAM"
     HACKING = "HACKING"
@@ -123,27 +152,20 @@ class Report(models.Model):
         IPAddress,
         on_delete=models.CASCADE,
         related_name="reports",
-        verbose_name="Adresse IP"
+        verbose_name="Adresse IP",
     )
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name="reports",
-        verbose_name="Utilisateur"
+        verbose_name="Utilisateur",
     )
     reason = models.CharField(
-        max_length=50,
-        choices=REASON_CHOICES,
-        verbose_name="Raison"
+        max_length=50, choices=REASON_CHOICES, verbose_name="Raison"
     )
-    comment = models.TextField(
-        max_length=1000,
-        blank=True,
-        verbose_name="Commentaire"
-    )
+    comment = models.TextField(max_length=1000, blank=True, verbose_name="Commentaire")
     created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name="Date de création"
+        auto_now_add=True, verbose_name="Date de création"
     )
 
     class Meta:
@@ -171,10 +193,11 @@ class CIDRField(models.Field):
     Custom field for PostgreSQL CIDR type.
     Stores IP network ranges (e.g., 192.168.1.0/24, 2001:db8::/32).
     """
+
     description = "PostgreSQL CIDR network field"
 
     def db_type(self, connection):
-        return 'cidr'
+        return "cidr"
 
     def from_db_value(self, value, expression, connection):
         if value is None:
@@ -182,7 +205,7 @@ class CIDRField(models.Field):
         return str(value)
 
     def to_python(self, value):
-        if value is None or value == '':
+        if value is None or value == "":
             return value
         if isinstance(value, str):
             try:
@@ -205,13 +228,12 @@ class IPRange(models.Model):
     Uses PostgreSQL CIDR type for efficient subnet matching and range operations.
     Useful for blocking entire networks (botnets, cloud providers, etc.)
     """
+
     network = CIDRField(unique=True, verbose_name="Réseau CIDR")
     description = models.CharField(max_length=500, verbose_name="Description")
     is_blocked = models.BooleanField(default=False, verbose_name="Bloqué")
     severity = models.IntegerField(
-        default=50,
-        verbose_name="Sévérité",
-        help_text="Niveau de dangerosité (0-100)"
+        default=50, verbose_name="Sévérité", help_text="Niveau de dangerosité (0-100)"
     )
     created_by = models.ForeignKey(
         User,
@@ -219,9 +241,11 @@ class IPRange(models.Model):
         null=True,
         blank=True,
         related_name="created_ranges",
-        verbose_name="Créé par"
+        verbose_name="Créé par",
     )
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name="Date de création"
+    )
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Date de mise à jour")
 
     class Meta:
