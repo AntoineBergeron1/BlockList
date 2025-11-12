@@ -270,7 +270,7 @@ class IPChartManager {
   startAutoRefresh() {
     this.refreshInterval = setInterval(() => {
       this.refreshChartData();
-    }, 15000);
+    }, 10000);
 
     window.addEventListener('beforeunload', () => {
       if (this.refreshInterval) {
