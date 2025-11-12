@@ -71,7 +71,7 @@ class TestIPChartDataAPI:
         assert response.status_code == 400
         data = response.json()
         assert "error" in data
-        assert data["error"] == "Invalid IP address"
+        assert data["error"] == "Adresse IP invalide"
 
     def test_chart_data_nonexistent_ip(self, client):
         """Test API returns 404 for non-existent IP."""
@@ -81,7 +81,7 @@ class TestIPChartDataAPI:
         assert response.status_code == 404
         data = response.json()
         assert "error" in data
-        assert data["error"] == "IP not found"
+        assert data["error"] == "IP non trouvée"
 
     def test_chart_data_top_users_limit(self, client):
         """Test API limits top users to 5."""
