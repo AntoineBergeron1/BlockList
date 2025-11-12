@@ -314,7 +314,7 @@ def ip_chart_data(request, ip_address):
 def profile_public_user(request,pk):
     """Profile publique d'un utilisateur"""
     utilisateur = get_object_or_404(User, id=pk)
-    reports = Report.objects.all()
+    reports = Report.objects.filter(user=utilisateur)
 
     return render(
         request, "deepweb/profile_public_user.html", {"utilisateur": utilisateur, "reports":reports}
