@@ -141,8 +141,12 @@
 
     <!-- Reports List -->
     <div class="card">
-      <div class="card-header">
+      <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Historique des signalements pour {{ ip_address.address }}</h5>
+        <div id="live-update-indicator" class="text-muted small" style="display: none;">
+          <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+          Mise à jour automatique
+        </div>
       </div>
       <div class="card-body">
         {% if reports %}
@@ -157,9 +161,9 @@
                   <th style="width: 20%;" class="text-end">Raison</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="reports-tbody">
                 {% for report in reports %}
-                  <tr>
+                  <tr data-report-id="{{ report.id }}">
                     <td>
                       <a href="#" class="text-decoration-none">
                         {{ report.user.username }}
@@ -233,13 +237,105 @@
 <script src="{% static 'deepweb/js/ip-charts.js' %}"></script>
 
 <script>
-// AJAX Load More functionality (to be implemented)
+// AJAX Live Updates for Reports
 document.addEventListener('DOMContentLoaded', function() {
-  const loadMoreBtn = document.getElementById('load-more-btn');
-  if (loadMoreBtn) {
-    loadMoreBtn.addEventListener('click', function() {
-      // AJAX implementation will go here
-      console.log('Load more clicked - AJAX to be implemented');
+  const ipAddress = '{{ ip_address.address }}';
+  const reportsTbody = document.getElementById('reports-tbody');
+  const liveIndicator = document.getElementById('live-update-indicator');
+  let latestReportId = null;
+  let pollInterval = null;
+
+  // Get the latest report ID from the current table
+  function getLatestReportId() {
+    const firstRow = reportsTbody.querySelector('tr[data-report-id]');
+    return firstRow ? parseInt(firstRow.dataset.reportId) : null;
+  }
+
+  // Initialize latest ID
+  latestReportId = getLatestReportId();
+
+  // Function to add new report rows to the table
+  function addNewReports(reports) {
+    if (reports.length === 0) return;
+
+    // Show live indicator briefly
+    liveIndicator.style.display = 'block';
+    setTimeout(() => {
+      liveIndicator.style.display = 'none';
+    }, 2000);
+
+    // Add new rows at the top with animation
+    reports.reverse().forEach(report => {
+      const newRow = document.createElement('tr');
+      newRow.dataset.reportId = report.id;
+      newRow.className = 'table-success'; // Highlight new rows
+      newRow.innerHTML = `
+        <td>
+          <a href="#" class="text-decoration-none">
+            ${report.user}
+          </a>
+        </td>
+        <td>
+          <time datetime="${report.date_iso}">
+            ${report.date}
+            <br>
+            <small class="text-muted">(${report.time_since})</small>
+          </time>
+        </td>
+        <td>
+          <div style="max-width: 400px;">
+            ${report.comment ? report.comment : '<span class="text-muted fst-italic">Aucun commentaire</span>'}
+          </div>
+        </td>
+        <td class="text-end">
+          <span class="badge bg-secondary">${report.reason}</span>
+        </td>
+      `;
+
+      reportsTbody.insertBefore(newRow, reportsTbody.firstChild);
+
+      // Remove highlight after 3 seconds
+      setTimeout(() => {
+        newRow.classList.remove('table-success');
+      }, 3000);
+    });
+
+    // Update latest ID
+    latestReportId = reports[reports.length - 1].id;
+  }
+
+  // Function to poll for new reports
+  async function pollForNewReports() {
+    if (!latestReportId) return;
+
+    try {
+      const url = `/api/reports/${ipAddress}/?since_id=${latestReportId}`;
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        console.error('Failed to fetch reports:', response.status);
+        return;
+      }
+
+      const data = await response.json();
+
+      if (data.count > 0) {
+        addNewReports(data.reports);
+      }
+    } catch (error) {
+      console.error('Error polling for reports:', error);
+    }
+  }
+
+  // Start polling every 10 seconds
+  if (reportsTbody) {
+    pollInterval = setInterval(pollForNewReports, 10000);
+
+    // Stop polling when user leaves the page
+    window.addEventListener('beforeunload', () => {
+      if (pollInterval) {
+        clearInterval(pollInterval);
+      }
     });
   }
 });

@@ -17,4 +17,7 @@ urlpatterns = [
     path("report/<str:ip_address>/", views.report_ip, name="report_ip"),
     # API endpoints
     path("api/chart/<str:ip_address>/", views.ip_chart_data, name="ip_chart_data"),
+    path(
+        "api/reports/<str:ip_address>/", views.ip_reports_api, name="ip_reports_api"
+    ),
 ]
