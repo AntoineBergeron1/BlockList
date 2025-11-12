@@ -161,7 +161,7 @@
                 {% for report in reports %}
                   <tr>
                     <td>
-                      <a href="#" class="text-decoration-none">
+                      <a href="{% url 'profile_public_user' report.user.id %}" class="text-decoration-none">
                         {{ report.user.username }}
                       </a>
                     </td>
