@@ -255,12 +255,12 @@ def ip_chart_data(request, ip_address):
     try:
         ipaddress.ip_address(ip_address)
     except ValueError:
-        return JsonResponse({"error": "Invalid IP address"}, status=400)
+        return JsonResponse({"error": "Adresse IP invalide"}, status=400)
 
     try:
         ip_obj = IPAddress.objects.get(address=ip_address)
     except IPAddress.DoesNotExist:
-        return JsonResponse({"error": "IP not found"}, status=404)
+        return JsonResponse({"error": "IP non trouvée"}, status=404)
 
     reports = ip_obj.reports.select_related("user").order_by("created_at")
 
