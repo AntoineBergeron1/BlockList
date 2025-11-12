@@ -21,6 +21,7 @@ class IPChartManager {
     if (this.chartData) {
       this.createChart();
       this.attachEventListeners();
+      this.startAutoRefresh();
     }
   }
 
@@ -237,6 +238,41 @@ class IPChartManager {
     if (this.canvas) {
       this.canvas.style.display = 'none';
     }
+  }
+
+  async refreshChartData() {
+    try {
+      const url = `/api/chart/${this.ipAddress}/`;
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        return;
+      }
+
+      const newData = await response.json();
+
+      if (JSON.stringify(newData) !== JSON.stringify(this.chartData)) {
+        this.chartData = newData;
+        if (this.chart) {
+          this.chart.data = this.getChartDataForView(this.currentView);
+          this.chart.update('none');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to refresh chart data:', error);
+    }
+  }
+
+  startAutoRefresh() {
+    this.refreshInterval = setInterval(() => {
+      this.refreshChartData();
+    }, 15000);
+
+    window.addEventListener('beforeunload', () => {
+      if (this.refreshInterval) {
+        clearInterval(this.refreshInterval);
+      }
+    });
   }
 }
 
