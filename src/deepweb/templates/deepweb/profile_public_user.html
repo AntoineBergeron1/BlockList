@@ -1,13 +1,19 @@
 {% extends "deepweb/base.html" %}
 
 {% block contenu %}
-
-<h1>Username : {{utilisateur.username}}</h1>
-<h2>Information de l'utilisateur : </h2>
-<p>Nom : {{utilisateur.first_name}}</p>
-<p>Prénom : {{utilisateur.last_name}}</p>
-
-<h2>Report de l'utilisateur : </h2>
+<h1>Information de l'utilisateur  : {{utilisateur.username}}</h1>
+<p>Nom : {{utilisateur.first_name}} {{utilisateur.last_name}}</p>
+<p>Dernière connexion :
+    <time datetime="{{ utilisateur.last_login|date:'c' }}">
+                    {{ utilisateur.last_login|date:"Y-m-d H:i" }}
+    </time>
+</p>
+<p>Date d'inscription :
+    <time datetime="{{ utilisateur.date_joined|date:'c' }}">
+                    {{ utilisateur.date_joined|date:"Y-m-d H:i" }}
+    </time>
+</p>
+<h2>Report de l'utilisateur </h2>
 
 <table class="table table-striped table-hover">
     <thead>
