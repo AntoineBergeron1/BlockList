@@ -11,8 +11,8 @@ from django.core.files.storage import FileSystemStorage
 from django.db.models import Count, Max, Min
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-
-from .forms import LoginForm, RegisterForm, ReportForm, SearchForm
+from django.contrib.auth.hashers import check_password
+from .forms import LoginForm, RegisterForm, ReportForm, SearchForm, ModifierProfilForm
 from .models import IPAddress, Report, User
 
 utilisateurs = User.objects.all()
@@ -39,23 +39,41 @@ def index(request):
     )
 
 
+
 def register(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            messages.success(request, "Compte créé avec succès !")
+            username = form.cleaned_data["username"]
+            password = form.cleaned_data["password1"]
+            email = form.cleaned_data["email"]
 
-            return redirect("connecter")
+            try:
+                user = User.objects.get(username=username)
+                if not user.is_active:
+                    if check_password(password, user.password):
+                        user.is_active = True
+                        user.email = email
+                        user.save()
+                        messages.success(request, "Compte réactivé avec succès !")
+                        login(request, user)
+                        return redirect("connecter")
+                    else:
+                        messages.error(request, "Mot de passe incorrect pour réactivation.")
+                        return render(request, "deepweb/register.html", {"form": form})
+                else:
+                    messages.error(request, "Nom d'utilisateur déjà pris.")
+                    return render(request, "deepweb/register.html", {"form": form})
+            except User.DoesNotExist:
+                user = form.save()
+                login(request, user)
+                messages.success(request, "Compte créé avec succès !")
+                return redirect("connecter")
         else:
             messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
-
     else:
         form = RegisterForm()
-
     return render(request, "deepweb/register.html", {"form": form})
-
 
 def connecter(request):
     if request.method == "POST":
@@ -316,3 +334,54 @@ def ip_chart_data(request, ip_address):
     }
 
     return JsonResponse(response_data)
+
+
+def mettre_a_jour_utilisateur(request, utilisateur):
+    utilisateur.email = request.POST.get("email", utilisateur.email)
+    utilisateur.first_name = request.POST.get("first_name", utilisateur.first_name)
+    utilisateur.last_name = request.POST.get("last_name", utilisateur.last_name)
+    utilisateur.save()
+
+
+def modifier_compte(request, id):
+    """Modifier le profile utilisatreur"""
+    utilisateur = request.user
+    if not utilisateur.is_authenticated:
+        messages.error(request, "Vous devez être connecté pour modifier votre profil.")
+        return redirect("connecter")
+    if utilisateur.id != id:
+        messages.error(request, "Vous n'avez pas accès à cette page.")
+        return redirect("index")
+
+    if request.method == "POST":
+        form = ModifierProfilForm(request.POST, instance=utilisateur)
+        if form.is_valid():
+            mettre_a_jour_utilisateur(request, utilisateur)
+            form.save()
+
+            messages.success(request, "Profil mis à jour avec succès !")
+            return redirect("modifier_compte", id=id)
+        else:
+
+            messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
+    else:
+        form = ModifierProfilForm(instance=utilisateur)
+
+    return render(request, "deepweb/modifier_compte.html", {"form": form})
+
+
+def supprimer_compte(request, id):
+    """Supprimer le compte"""
+    utilisateur = request.user
+    if not utilisateur.is_authenticated:
+        messages.error(request, "Vous devez être connecté pour supprimer votre profil.")
+        return redirect("modifier_compte", id = id)
+    if utilisateur.id != id:
+        messages.error(request, "Vous n'avez pas accès à cette page.")
+        return redirect("modifier_compte", id = id)
+    if request.method == "POST":
+        utilisateur.is_active = False
+        utilisateur.save()
+        messages.success(request, "Votre compte a été supprimé avec succès.")
+        return redirect("index")
+

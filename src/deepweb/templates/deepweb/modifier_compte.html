@@ -1,0 +1,24 @@
+{% extends "deepweb/base.html" %}
+{% load static %}
+{% block title %}Modifier mon compte{% endblock %}
+
+{% block contenu %}
+{% if messages %}
+<ul class="messages list-unstyled">
+    {% for message in messages %}
+    <li {% if message.tags %} class="alert alert-{{ message.tags }} "{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+<form action="{% url 'modifier_compte' request.user.id %}" method="post" novalidate>
+    {% csrf_token %}
+    {{form.as_p }}
+    <input class="btn btn-primary" type="submit" value="Enregistrer les changements" />
+ </form>
+
+ <form action="{% url 'supprimer_compte' request.user.id %}" method="POST" >
+{% csrf_token %}
+ <input class="btn btn-danger" type="submit" value ="Supprimer le compte"/>
+ </form>
+
+{% endblock %}
