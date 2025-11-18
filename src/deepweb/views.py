@@ -1,5 +1,6 @@
 import ipaddress
 import os
+from datetime import datetime, timedelta
 
 from django.conf import (  # TODO: Used for DEBUG in login view quick-login buttons
     settings,
@@ -10,8 +11,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
 from django.core.files.storage import FileSystemStorage
 from django.db.models import Count, Max, Min
+from django.db.models.functions import TruncDate, TruncHour
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.utils.timesince import timesince
 
 from .forms import LoginForm, RegisterForm, ReportForm, SearchForm, UpdateProfileForm
@@ -415,6 +418,147 @@ def ip_chart_data(request, ip_address):
     }
 
     return JsonResponse(response_data)
+
+
+def statistics(request):
+    """
+    Display statistics page with charts and metrics.
+    Shows reporting trends, top reported IPs, and geographic distribution.
+    """
+    now = timezone.now()
+
+    # Calculate report counts for different time periods
+    reports_last_hour = Report.objects.filter(
+        created_at__gte=now - timedelta(hours=1)
+    ).count()
+    reports_last_24h = Report.objects.filter(
+        created_at__gte=now - timedelta(hours=24)
+    ).count()
+    reports_last_7d = Report.objects.filter(
+        created_at__gte=now - timedelta(days=7)
+    ).count()
+    reports_last_30d = Report.objects.filter(
+        created_at__gte=now - timedelta(days=30)
+    ).count()
+
+    # Get top 10 most reported IPs in last 24 hours
+    top_ips_24h = (
+        Report.objects.filter(created_at__gte=now - timedelta(hours=24))
+        .values("ip_address__address", "ip_address__hostname")
+        .annotate(
+            report_count=Count("id"),
+            unique_users=Count("user", distinct=True),
+        )
+        .order_by("-report_count")[:10]
+    )
+
+    # Get recently reported IPs (last 20)
+    recent_ips = (
+        Report.objects.select_related("ip_address")
+        .order_by("-created_at")
+        .values_list("ip_address__address", flat=True)
+        .distinct()[:20]
+    )
+
+    context = {
+        "reports_last_hour": reports_last_hour,
+        "reports_last_24h": reports_last_24h,
+        "reports_last_7d": reports_last_7d,
+        "reports_last_30d": reports_last_30d,
+        "top_ips_24h": top_ips_24h,
+        "recent_ips": recent_ips,
+    }
+
+    return render(request, "deepweb/statistics.html", context)
+
+
+def statistics_chart_data(request, timeframe):
+    """
+    API endpoint for statistics chart data.
+    Returns JSON data for Chart.js with different timeframes.
+    Timeframes: 'day' (last 24 hours), 'week' (last 7 days), 'month' (last 30 days)
+    """
+    now = timezone.now()
+
+    if timeframe == "day":
+        # Last 24 hours, grouped by hour
+        start_time = now - timedelta(hours=24)
+        reports = (
+            Report.objects.filter(created_at__gte=start_time)
+            .annotate(hour=TruncHour("created_at"))
+            .values("hour")
+            .annotate(count=Count("id"))
+            .order_by("hour")
+        )
+
+        labels = []
+        data = []
+        for report in reports:
+            labels.append(report["hour"].strftime("%H:%M"))
+            data.append(report["count"])
+
+    elif timeframe == "week":
+        # Last 7 days, grouped by day
+        start_time = now - timedelta(days=7)
+        reports = (
+            Report.objects.filter(created_at__gte=start_time)
+            .annotate(day=TruncDate("created_at"))
+            .values("day")
+            .annotate(count=Count("id"))
+            .order_by("day")
+        )
+
+        labels = []
+        data = []
+        for report in reports:
+            labels.append(report["day"].strftime("%Y-%m-%d"))
+            data.append(report["count"])
+
+    elif timeframe == "month":
+        # Last 30 days, grouped by day
+        start_time = now - timedelta(days=30)
+        reports = (
+            Report.objects.filter(created_at__gte=start_time)
+            .annotate(day=TruncDate("created_at"))
+            .values("day")
+            .annotate(count=Count("id"))
+            .order_by("day")
+        )
+
+        labels = []
+        data = []
+        for report in reports:
+            labels.append(report["day"].strftime("%Y-%m-%d"))
+            data.append(report["count"])
+
+    else:
+        return JsonResponse({"error": "Invalid timeframe"}, status=400)
+
+    return JsonResponse({"labels": labels, "data": data})
+
+
+def statistics_threat_data(request):
+    """
+    API endpoint for threat distribution chart.
+    Returns threat types distribution for the last 7 days.
+    """
+    now = timezone.now()
+    start_time = now - timedelta(days=7)
+
+    threat_data = (
+        Report.objects.filter(created_at__gte=start_time)
+        .values("reason")
+        .annotate(count=Count("id"))
+        .order_by("-count")
+    )
+
+    labels = [
+        dict(Report.REASON_CHOICES).get(item["reason"], item["reason"])
+        for item in threat_data
+    ]
+    data = [item["count"] for item in threat_data]
+
+    return JsonResponse({"labels": labels, "data": data})
 
 
 def profile_public_user(request, pk):

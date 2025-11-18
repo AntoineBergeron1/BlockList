@@ -45,8 +45,6 @@
       <div class="card">
         <div class="card-body ">
         <div class="d-flex justify-content-around" >
-            <h4><a href="{% url 'ip_detail' ip.address %}" class="text-decoration-none">{{ip.address}}</a></h4>
-            <p>Note {{ip.reputation_score}}/100</p>
             <h4><a href="{% url 'ip_detail' ip.address %}" class="text-decoration-none">IPV{{ip.version}} : {{ip.address}}</a></h4>
             <p>Score {{ip.reputation_score}}/100</p>
             <p>Création : {{ip.created_at.year}}-{{ip.created_at.month}}-{{ip.created_at.day}}</p>
