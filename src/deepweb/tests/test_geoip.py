@@ -1,14 +1,24 @@
-from unittest.mock import Mock, patch
+from unittest.mock import patch
+
+from django.conf import settings
 
 import pytest
 
 from deepweb.models import IPAddress
+
+# Check if GeoIP databases are available
+GEOIP_AVAILABLE = (
+    hasattr(settings, "GEOIP_PATH")
+    and (settings.GEOIP_PATH / "GeoLite2-City.mmdb").exists()
+    and (settings.GEOIP_PATH / "GeoLite2-ASN.mmdb").exists()
+)
 
 
 @pytest.mark.django_db
 class TestGeoIPEnrichment:
     """Tests for GeoIP enrichment functionality."""
 
+    @pytest.mark.skipif(not GEOIP_AVAILABLE, reason="GeoIP databases not available")
     def test_enrich_geoip_success(self):
         """Test successful GeoIP enrichment."""
         ip = IPAddress.objects.create(address="8.8.8.8")
@@ -17,6 +27,7 @@ class TestGeoIPEnrichment:
         assert result is True
         assert ip.country_code is not None or ip.asn is not None
 
+    @pytest.mark.skipif(not GEOIP_AVAILABLE, reason="GeoIP databases not available")
     def test_enrich_geoip_private_ip(self):
         """Test GeoIP enrichment with private IP (should not crash)."""
         ip = IPAddress.objects.create(address="192.168.1.1")
@@ -27,6 +38,7 @@ class TestGeoIPEnrichment:
         assert ip.country_code is None
         assert ip.asn is None
 
+    @pytest.mark.skipif(not GEOIP_AVAILABLE, reason="GeoIP databases not available")
     def test_enrich_geoip_ipv6(self):
         """Test GeoIP enrichment with IPv6 address."""
         ip = IPAddress.objects.create(address="2001:4860:4860::8888")
@@ -62,6 +74,7 @@ class TestGeoIPEnrichment:
         # Should return False on error
         assert result is False
 
+    @pytest.mark.skipif(not GEOIP_AVAILABLE, reason="GeoIP databases not available")
     def test_enrich_geoip_updates_only_geo_fields(self):
         """Test that enrich_geoip only updates geo fields."""
         ip = IPAddress.objects.create(address="8.8.8.8")
