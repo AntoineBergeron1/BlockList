@@ -1,10 +1,11 @@
 from django import forms
-from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.forms.widgets import Select
 
-from .models import IPAddress, Report, User
+from .models import IPAddress, Report
+
+User = get_user_model()
 
 
 class SelectWithDisabledOption(Select):
@@ -20,8 +21,6 @@ class SelectWithDisabledOption(Select):
         if value == "":
             option["attrs"]["disabled"] = "disabled"
         return option
-
-User = get_user_model()
 
 
 class RegisterForm(UserCreationForm):
@@ -142,7 +141,7 @@ class LoginForm(forms.Form):
     )
 
 
-class ModifierProfilForm(forms.ModelForm):
+class UpdateProfileForm(forms.ModelForm):
     first_name = forms.CharField(
         required=True,
         widget=forms.TextInput(attrs={"class": "form-control"}),
@@ -275,8 +274,7 @@ class SearchForm(forms.Form):
         required=False,
         widget=forms.TextInput(
             attrs={
-                "class": "form-control",
-                "class": "m-1",
+                "class": "form-control m-1",
                 "placeholder": "Entrez une adresse IP...",
             }
         ),
@@ -293,7 +291,7 @@ class SearchForm(forms.Form):
             ("reputationDecroissant", "Réputation (décroissante)"),
         ],
         label="",
-        widget=forms.Select(attrs={"class": "form-control", "class": "m-1"}),
+        widget=forms.Select(attrs={"class": "form-control m-1"}),
         required=False,
     )
 

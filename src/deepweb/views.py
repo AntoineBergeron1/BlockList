@@ -14,7 +14,7 @@ from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timesince import timesince
 
-from .forms import LoginForm, ModifierProfilForm, RegisterForm, ReportForm, SearchForm
+from .forms import LoginForm, RegisterForm, ReportForm, SearchForm, UpdateProfileForm
 from .models import IPAddress, Report, User
 
 utilisateurs = User.objects.all()
@@ -455,7 +455,7 @@ def modifier_compte(request, id):
         return redirect("index")
 
     if request.method == "POST":
-        form = ModifierProfilForm(request.POST, instance=utilisateur)
+        form = UpdateProfileForm(request.POST, instance=utilisateur)
         password = request.POST.get("password")
         password_confirm = request.POST.get("password_confirm")
         if form.is_valid():
@@ -472,7 +472,7 @@ def modifier_compte(request, id):
         else:
             messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
     else:
-        form = ModifierProfilForm(instance=utilisateur)
+        form = UpdateProfileForm(instance=utilisateur)
 
     return render(request, "deepweb/modifier_compte.html", {"form": form})
 
