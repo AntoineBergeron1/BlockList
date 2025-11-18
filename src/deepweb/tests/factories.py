@@ -1,9 +1,11 @@
 """
 Factory Boy factories for creating test data.
 """
+
 import factory
 from factory.django import DjangoModelFactory
-from deepweb.models import User, IPAddress, Report
+
+from deepweb.models import IPAddress, Report, User
 
 
 class UserFactory(DjangoModelFactory):

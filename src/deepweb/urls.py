@@ -14,10 +14,16 @@ urlpatterns = [
     path("compte/<int:id>/", views.modifier_compte, name="modifier_compte"),
     path("user/", views.list_user, name="list_user"),
     path("user/<int:pk>", views.list_user_update, name="list_user_update"),
+    path(
+        "profilepublic/user/<int:pk>",
+        views.profile_public_user,
+        name="profile_public_user",
+    ),
     # IP and Report URLs
     path("check/<str:ip_address>/", views.ip_detail, name="ip_detail"),
     path("report/", views.report_ip, name="report_ip"),
     path("report/<str:ip_address>/", views.report_ip, name="report_ip"),
     # API endpoints
     path("api/chart/<str:ip_address>/", views.ip_chart_data, name="ip_chart_data"),
+    path("api/reports/<str:ip_address>/", views.ip_reports_api, name="ip_reports_api"),
 ]

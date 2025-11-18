@@ -2,7 +2,24 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
-from .models import User, Report, IPAddress
+from django.forms.widgets import Select
+
+from .models import IPAddress, Report, User
+
+
+class SelectWithDisabledOption(Select):
+    """Custom Select widget that allows disabling specific options"""
+
+    def create_option(
+        self, name, value, label, selected, index, subindex=None, attrs=None
+    ):
+        option = super().create_option(
+            name, value, label, selected, index, subindex, attrs
+        )
+        # Disable the empty option (value='')
+        if value == "":
+            option["attrs"]["disabled"] = "disabled"
+        return option
 
 User = get_user_model()
 
@@ -13,8 +30,8 @@ class RegisterForm(UserCreationForm):
         widget=forms.EmailInput(attrs={"class": "form-control"}),
         help_text=None,
         error_messages={
-            "required": "Courriel : Le courriel est obligatoire",
-            "invalid": "Courriel : Le courriel est invalide",
+            "required": "Le courriel est obligatoire",
+            "invalid": "Le courriel est invalide",
         },
         label="Courriel : ",
     )
@@ -24,7 +41,7 @@ class RegisterForm(UserCreationForm):
         widget=forms.TextInput(attrs={"class": "form-control"}),
         help_text=None,
         error_messages={
-            "required": "Prénom : Le prénom est obligatoire",
+            "required": "Le prénom est obligatoire",
         },
         label="Prénom : ",
     )
@@ -42,14 +59,14 @@ class RegisterForm(UserCreationForm):
         label="Confirmer le mot de passe : ",
         widget=forms.PasswordInput(attrs={"class": "form-control"}),
         error_messages={
-            "required": "Confirmation du mot de passe : Veuillez confirmer votre mot de passe.",
+            "required": "Veuillez confirmer votre mot de passe.",
         },
     )
     password1 = forms.CharField(
         label="Mot de passe : ",
         widget=forms.PasswordInput(attrs={"class": "form-control"}),
         error_messages={
-            "required": "Mot de passe : Mot de passe obligatoire.",
+            "required": "Mot de passe obligatoire.",
         },
     )
 
@@ -110,8 +127,8 @@ class LoginForm(forms.Form):
         widget=forms.TextInput(attrs={"class": "form-control"}),
         label="Nom d'utilisateur",
         error_messages={
-            "required": "Nom d'utilisateur : Le nom d'utilisateur est obligatoire",
-            "invalid": "Nom d'utilisateur : Le nom d'utilisateur n'est pas conforme",
+            "required": "Le nom d'utilisateur est obligatoire",
+            "invalid": "Le nom d'utilisateur n'est pas conforme",
         },
     )
     password = forms.CharField(
@@ -119,8 +136,8 @@ class LoginForm(forms.Form):
         widget=forms.PasswordInput(attrs={"class": "form-control"}),
         label="Mot de passe",
         error_messages={
-            "required": "Mot de passe : Le mot de passe est obligatoire",
-            "invalid": "Mot de passe : Le mot de passe n'est pas conforme",
+            "required": "Le mot de passe est obligatoire",
+            "invalid": "Le mot de passe n'est pas conforme",
         },
     )
 
@@ -190,7 +207,7 @@ class ReportForm(forms.ModelForm):
         model = Report
         fields = ["ip_address", "reason", "comment"]
         widgets = {
-            "reason": forms.Select(attrs={"class": "form-control"}),
+            "reason": SelectWithDisabledOption(attrs={"class": "form-control"}),
             "comment": forms.Textarea(
                 attrs={
                     "class": "form-control",
@@ -267,13 +284,13 @@ class SearchForm(forms.Form):
 
     tries = forms.ChoiceField(
         choices=[
-            ("default", "Trier par : (Défaut)"),
-            ("creationCroissant", "Date de création (Croissant)"),
-            ("creationDecroissant", "Date de création (Décroissant)"),
-            ("modificationCroissant", "Date de modification (Croissant)"),
-            ("modificationDecroissant", "Date de modification (Décroissant)"),
-            ("reputationCroissant", "Réputation (Croissant)"),
-            ("reputationDecroissant", "Réputation (Décroissant)"),
+            ("default", "Trier par : (Par défaut)"),
+            ("creationCroissant", "Date de création (croissante)"),
+            ("creationDecroissant", "Date de création (décroissante)"),
+            ("modificationCroissant", "Date de modification (croissante)"),
+            ("modificationDecroissant", "Date de modification (décroissante)"),
+            ("reputationCroissant", "Réputation (croissante)"),
+            ("reputationDecroissant", "Réputation (décroissante)"),
         ],
         label="",
         widget=forms.Select(attrs={"class": "form-control", "class": "m-1"}),

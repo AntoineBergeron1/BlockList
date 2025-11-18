@@ -9,8 +9,7 @@
 {% endif %}
 
 <h1>BlockList</h1>
-<p><strong>BlockList</strong>, un site qui vous permet de consulter si une adresse IP
-  a été signalée pour activité suspecte, d'en consulter l'historique et de signaler des adresses IP</p>
+<p><strong>BlockList</strong> est un service communautaire pour rechercher et signaler des adresses IP suspectes.</p>
 
 <section>
     <h2>Recherche IP</h2>
@@ -48,6 +47,8 @@
         <div class="d-flex justify-content-around" >
             <h4><a href="{% url 'ip_detail' ip.address %}" class="text-decoration-none">{{ip.address}}</a></h4>
             <p>Note {{ip.reputation_score}}/100</p>
+            <h4><a href="{% url 'ip_detail' ip.address %}" class="text-decoration-none">IPV{{ip.version}} : {{ip.address}}</a></h4>
+            <p>Score {{ip.reputation_score}}/100</p>
             <p>Création : {{ip.created_at.year}}-{{ip.created_at.month}}-{{ip.created_at.day}}</p>
 
         </div>
@@ -63,7 +64,7 @@
 </section>
 
 <section>
-<h2>Dernières IP reportées :</h2>
+<h2>Derniers signalements :</h2>
     <div class="row">
         {% for report in recent_reports %}
             <div class="col-sm-4">
