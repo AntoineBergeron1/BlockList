@@ -102,6 +102,10 @@ def ip_detail(request, ip_address):
 
     ip_obj, created = IPAddress.objects.get_or_create(address=ip_address)
 
+    # Perform reverse DNS lookup if hostname is not set
+    if not ip_obj.hostname:
+        ip_obj.lookup_hostname()
+
     # Get reports with statistics
     reports = ip_obj.reports.select_related("user").order_by("-created_at")
 
