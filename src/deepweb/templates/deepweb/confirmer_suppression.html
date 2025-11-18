@@ -1,0 +1,13 @@
+{% extends "deepweb/base.html" %}
+{% load static %}
+
+{%block contenu%}
+<h1>Confirmer suppression</h1>
+
+<h2>Voulez vous vraiment supprimer le compte ?</h2>
+
+ <form action="{% url 'supprimer_compte' request.user.id %}" method="POST" >
+{% csrf_token %}
+ <input class="btn btn-danger" type="submit" value ="Supprimer le compte"/>
+ </form>
+ {%endblock%}

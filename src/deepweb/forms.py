@@ -12,7 +12,7 @@ class RegisterForm(UserCreationForm):
         required=True,
         widget=forms.EmailInput(attrs={"class": "form-control"}),
         help_text=None,
-            error_messages={
+        error_messages={
             "required": "Courriel : Le courriel est obligatoire",
             "invalid": "Courriel : Le courriel est invalide",
         },
@@ -75,7 +75,9 @@ class RegisterForm(UserCreationForm):
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
         if password1 and password2 and password1 != password2:
-            raise forms.ValidationError("Mot de passe : Les deux mots de passe ne correspondent pas.")
+            raise forms.ValidationError(
+                "Mot de passe : Les deux mots de passe ne correspondent pas."
+            )
         return password2
 
     def save(self, commit=True):
@@ -144,12 +146,27 @@ class ModifierProfilForm(forms.ModelForm):
         min_length=5,
     )
 
+    password = forms.CharField(
+        required=False,
+        widget=forms.PasswordInput(attrs={"class": "form-control"}),
+        label="Modifier mot de passe",
+        error_messages={"invalid": "Entrez un mot de passe valide."},
+    )
+    password_confirm = forms.CharField(
+        required=False,
+        widget=forms.PasswordInput(attrs={"class": "form-control"}),
+        label="Confirmer mot de passe",
+        error_messages={"invalid": "Entrez un mot de passe valide."},
+    )
+
     class Meta:
         model = User
         fields = [
             "first_name",
             "last_name",
             "email",
+            "password",
+            "password_confirm",
         ]
 
 
