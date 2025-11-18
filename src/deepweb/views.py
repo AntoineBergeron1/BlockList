@@ -280,6 +280,8 @@ def rechercher(request):
 
         form = SearchForm(request.POST)
         if form.is_valid():
+
+            versionSelectionnee = form.cleaned_data.get("filtres")
             resultat_recherche = form.cleaned_data["recherche"]
             optiontri = form.cleaned_data.get("tries")
             if resultat_recherche:
@@ -289,6 +291,10 @@ def rechercher(request):
                         results.append(ip)
             else:
                 results = IPAddress.objects.all()
+
+            if versionSelectionnee:
+                results = results.filter(version=versionSelectionnee)
+                print(versionSelectionnee)
 
             if optiontri == "reputationCroissant":
                 results = results.order_by("-reputation_score")
