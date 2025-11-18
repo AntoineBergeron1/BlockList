@@ -1,5 +1,5 @@
-from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
 
 User = get_user_model()
 
@@ -17,9 +17,7 @@ class Command(BaseCommand):
                 first_name="Test",
                 last_name="User",
             )
-            self.stdout.write(
-                self.style.SUCCESS("✓ Created test user: user / user123")
-            )
+            self.stdout.write(self.style.SUCCESS("✓ Created test user: user / user123"))
         else:
             self.stdout.write(self.style.WARNING("Test user already exists"))
 

@@ -1,3 +1,8 @@
-*.tar.gz
+# Ignore MaxMind database files (they're large and need license key)
 *.mmdb
+*.tar.gz
+*.zip
 GeoLite2-*/
+
+# Keep this directory
+!.gitignore
