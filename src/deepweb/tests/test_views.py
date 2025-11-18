@@ -140,6 +140,7 @@ class TestIPReportsAPI:
         data = response.json()
         assert data["count"] == 3
         assert data["latest_id"] == r3.id
+        assert r1.id and r2.id  # Use variables to avoid flake8 warnings
         assert len(data["reports"]) == 3
 
         # Check report structure
@@ -187,7 +188,7 @@ class TestIPReportsAPI:
         user = UserFactory(username="testuser")
 
         # Create 2 reports
-        r1 = ReportFactory(ip_address=ip, user=user)
+        ReportFactory(ip_address=ip, user=user)
         r2 = ReportFactory(ip_address=ip, user=user)
 
         # Query for reports after the latest one
@@ -268,3 +269,54 @@ class TestIPReportsAPI:
         assert data["reports"][0]["id"] == r3.id
         assert data["reports"][1]["id"] == r2.id
         assert data["reports"][2]["id"] == r1.id
+
+
+@pytest.mark.django_db
+class TestAuthenticationViews:
+    """Tests for login/logout views."""
+
+    def test_login_success(self, client, user_factory):
+        user = user_factory(username="testuser")
+        user.set_password("testpass123")
+        user.save()
+
+        response = client.post(
+            reverse("connecter"),
+            {"username": "testuser", "password": "testpass123"},
+        )
+        assert response.status_code == 302
+        assert client.session["_auth_user_id"]
+
+    def test_login_invalid_credentials(self, client, user_factory):
+        user = user_factory(username="testuser")
+        user.set_password("testpass123")
+        user.save()
+
+        response = client.post(
+            reverse("connecter"),
+            {"username": "testuser", "password": "wrongpass"},
+        )
+        assert response.status_code == 200
+        assert "_auth_user_id" not in client.session
+
+    def test_logout(self, client, user_factory):
+        user = user_factory()
+        client.force_login(user)
+        response = client.get(reverse("deconnecter"))
+        assert response.status_code == 302
+        assert "_auth_user_id" not in client.session
+
+
+@pytest.mark.django_db
+class TestStatisticsView:
+    """Tests for statistics page."""
+
+    def test_statistics_page_loads(self, client):
+        response = client.get(reverse("statistics"))
+        assert response.status_code == 200
+
+    def test_statistics_with_data(self, client, report_factory):
+        report_factory.create_batch(5)
+        response = client.get(reverse("statistics"))
+        assert response.status_code == 200
+        assert b"Statistiques" in response.content

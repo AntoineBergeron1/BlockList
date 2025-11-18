@@ -1,0 +1,7 @@
+# Ignore MaxMind database files (they're large and need license key)
+*.mmdb
+*.tar.gz
+*.zip
+
+# Keep this directory
+!.gitignore

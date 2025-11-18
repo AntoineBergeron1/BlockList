@@ -93,3 +93,19 @@ class TestReportModel:
         report = report_factory(reason=Report.PHISHING)
         assert report.user.username in str(report)
         assert report.ip_address.address in str(report)
+
+    def test_reputation_reaches_minimum(self, ip_address_factory, report_factory):
+        """Test reputation cannot go below 0."""
+        ip = ip_address_factory()
+        report_factory.create_batch(25, ip_address=ip)
+        ip.calculate_reputation()
+        assert ip.reputation_score == 0
+
+    def test_multiple_reports_same_user(self, ip_address_factory, user_factory):
+        """Test multiple reports from same user."""
+        ip = ip_address_factory()
+        user = user_factory()
+        Report.objects.create(ip_address=ip, user=user, reason=Report.SPAM)
+        Report.objects.create(ip_address=ip, user=user, reason=Report.HACKING)
+        ip.refresh_from_db()
+        assert ip.reputation_score == 90
