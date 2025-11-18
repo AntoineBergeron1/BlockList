@@ -23,6 +23,7 @@ urlpatterns = [
         views.profile_public_user,
         name="profile_public_user",
     ),
+     path('check-email/', views.check_email, name='check_email'),
     # IP and Report URLs
     path("check/<str:ip_address>/", views.ip_detail, name="ip_detail"),
     path("report/", views.report_ip, name="report_ip"),

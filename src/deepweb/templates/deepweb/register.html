@@ -1,18 +1,27 @@
 {% extends "deepweb/base.html" %}
+{% load static %}
+
 {% block contenu %}
 
   {% if form.errors %}
-        <div class="alert alert-danger">
-            {% for field, errors in form.errors.items %}
-              {% for error in errors %}
-                <p>{{ error }}</p>
-              {% endfor %}
-            {% endfor %}
-        </div>
+    <div class="alert alert-danger">
+      {% for field, errors in form.errors.items %}
+        {% for error in errors %}
+          <p>{{ error }}</p>
+        {% endfor %}
+      {% endfor %}
+    </div>
   {% endif %}
 
-<form method="POST" novalidate>
-  {% csrf_token %} {{form}}
-  <input class="btn btn-primary" type="submit" value="S'inscrire" />
-</form>
+  <form method="POST" novalidate id="register-form">
+    {% csrf_token %} {{ form }}
+    <input class="btn btn-primary" type="submit" value="S'inscrire" />
+  </form>
+
+  <div id="email-feedback" style="color: red; margin-top: 10px;"></div>
+
+ <script src="{% static 'deepweb/js/checkmail.js' %}"></script>
+
+
+
 {% endblock %}
