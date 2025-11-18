@@ -122,12 +122,12 @@ jobs:
   #   - name: Test Docker Compose configuration
   #     run: |
   #       cd deployment
-  #       docker-compose config
+  #       docker compose config
   #
   #   - name: Build Docker images
   #     run: |
   #       cd deployment
-  #       docker-compose build --no-cache
+  #       docker compose build --no-cache
   #     env:
   #       DOCKER_BUILDKIT: 1
   #       COMPOSE_DOCKER_CLI_BUILD: 1

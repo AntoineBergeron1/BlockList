@@ -1,4 +1,5 @@
 import ipaddress
+import socket
 
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
@@ -40,6 +41,9 @@ class IPAddress(models.Model):
 
     address = models.GenericIPAddressField(unique=True, verbose_name="Adresse IP")
     version = models.IntegerField(choices=IP_VERSION_CHOICES, verbose_name="Version")
+    hostname = models.CharField(
+        max_length=255, blank=True, null=True, verbose_name="Nom de domaine"
+    )
     reputation_score = models.IntegerField(
         default=100, verbose_name="Score de réputation"
     )
@@ -97,6 +101,23 @@ class IPAddress(models.Model):
 
         self.save()
         return self.reputation_score
+
+    def lookup_hostname(self):
+        """
+        Perform reverse DNS lookup to retrieve hostname for this IP address.
+        Returns the hostname if found, None otherwise.
+        Updates the hostname field and saves the instance.
+        """
+        try:
+            hostname, _, _ = socket.gethostbyaddr(str(self.address))
+            self.hostname = hostname
+            self.save(update_fields=["hostname"])
+            return hostname
+        except (socket.herror, socket.gaierror, socket.timeout):
+            # No reverse DNS record found or lookup failed
+            self.hostname = None
+            self.save(update_fields=["hostname"])
+            return None
 
 
 class Report(models.Model):
