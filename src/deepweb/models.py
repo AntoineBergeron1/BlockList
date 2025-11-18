@@ -47,6 +47,26 @@ class IPAddress(models.Model):
     reputation_score = models.IntegerField(
         default=100, verbose_name="Score de réputation"
     )
+
+    # GeoIP2 enrichment fields
+    country_code = models.CharField(
+        max_length=2, blank=True, null=True, verbose_name="Code pays (ISO)"
+    )
+    country_name = models.CharField(
+        max_length=100, blank=True, null=True, verbose_name="Pays"
+    )
+    city = models.CharField(max_length=100, blank=True, null=True, verbose_name="Ville")
+    latitude = models.DecimalField(
+        max_digits=9, decimal_places=6, blank=True, null=True, verbose_name="Latitude"
+    )
+    longitude = models.DecimalField(
+        max_digits=9, decimal_places=6, blank=True, null=True, verbose_name="Longitude"
+    )
+    asn = models.IntegerField(blank=True, null=True, verbose_name="ASN")
+    asn_organization = models.CharField(
+        max_length=255, blank=True, null=True, verbose_name="Organisation ASN"
+    )
+
     created_at = models.DateTimeField(
         auto_now_add=True, verbose_name="Date de création"
     )
@@ -118,6 +138,59 @@ class IPAddress(models.Model):
             self.hostname = None
             self.save(update_fields=["hostname"])
             return None
+
+    def enrich_geoip(self):
+        """
+        Enrich IP address with GeoIP2 data (country, city, coordinates, ASN).
+        Requires GeoLite2 databases to be downloaded in GEOIP_PATH.
+        """
+        try:
+            from django.contrib.gis.geoip2 import GeoIP2
+
+            g = GeoIP2()
+            ip_str = str(self.address)
+
+            # City data (includes country, city, coordinates)
+            try:
+                city_data = g.city(ip_str)
+                if city_data:
+                    self.country_code = city_data.get("country_code")
+                    self.country_name = city_data.get("country_name")
+                    self.city = city_data.get("city")
+                    if "latitude" in city_data and "longitude" in city_data:
+                        self.latitude = city_data["latitude"]
+                        self.longitude = city_data["longitude"]
+            except Exception:
+                pass
+
+            # ASN data (requires GeoLite2-ASN.mmdb)
+            try:
+                from django.conf import settings
+
+                import geoip2.database
+
+                asn_db_path = settings.GEOIP_PATH / "GeoLite2-ASN.mmdb"
+                with geoip2.database.Reader(str(asn_db_path)) as reader:
+                    asn_data = reader.asn(ip_str)
+                    self.asn = asn_data.autonomous_system_number
+                    self.asn_organization = asn_data.autonomous_system_organization
+            except Exception:
+                pass
+
+            self.save(
+                update_fields=[
+                    "country_code",
+                    "country_name",
+                    "city",
+                    "latitude",
+                    "longitude",
+                    "asn",
+                    "asn_organization",
+                ]
+            )
+            return True
+        except Exception:
+            return False
 
 
 class Report(models.Model):
