@@ -320,3 +320,114 @@ class TestStatisticsView:
         response = client.get(reverse("statistics"))
         assert response.status_code == 200
         assert b"Statistiques" in response.content
+
+
+@pytest.mark.django_db
+class TestIndexView:
+    """Tests for index page."""
+
+    def test_index_loads(self, client):
+        response = client.get(reverse("index"))
+        assert response.status_code == 200
+
+    def test_index_shows_recent_reports(self, client, report_factory):
+        report_factory.create_batch(3)
+        response = client.get(reverse("index"))
+        assert response.status_code == 200
+        assert b"BlockList" in response.content
+
+
+@pytest.mark.django_db
+class TestReportIPView:
+    """Tests for report_ip view."""
+
+    def test_report_ip_requires_login(self, client):
+        response = client.get(reverse("report_ip"))
+        assert response.status_code == 302
+        assert "/accounts/login/" in response.url
+
+    def test_report_ip_form_loads(self, client, user_factory):
+        user = user_factory()
+        client.force_login(user)
+        response = client.get(reverse("report_ip"))
+        assert response.status_code == 200
+
+    def test_create_report_for_new_ip(self, client, user_factory):
+        user = user_factory()
+        client.force_login(user)
+
+        response = client.post(
+            reverse("report_ip"),
+            {
+                "ip_address": "8.8.8.8",
+                "reason": "SPAM",
+                "comment": "Test report",
+            },
+        )
+        assert response.status_code == 302
+        assert Report.objects.filter(ip_address__address="8.8.8.8").exists()
+
+    def test_create_report_for_existing_ip(
+        self, client, user_factory, ip_address_factory
+    ):
+        user = user_factory()
+        client.force_login(user)
+        ip = ip_address_factory(address="1.2.3.4")
+
+        response = client.post(
+            reverse("report_ip", kwargs={"ip_address": ip.address}),
+            {
+                "ip_address": ip.address,
+                "reason": "HACKING",
+                "comment": "Suspicious activity",
+            },
+        )
+        assert response.status_code == 302
+        assert Report.objects.filter(ip_address=ip, user=user).exists()
+
+
+@pytest.mark.django_db
+class TestIPDetailView:
+    """Tests for ip_detail view."""
+
+    def test_ip_detail_loads(self, client, ip_address_factory):
+        ip = ip_address_factory(address="10.0.0.1")
+        response = client.get(reverse("ip_detail", kwargs={"ip_address": ip.address}))
+        assert response.status_code == 200
+        assert b"10.0.0.1" in response.content
+
+    def test_ip_detail_with_reports(self, client, ip_address_factory, report_factory):
+        ip = ip_address_factory(address="10.0.0.2")
+        report_factory.create_batch(3, ip_address=ip)
+
+        response = client.get(reverse("ip_detail", kwargs={"ip_address": ip.address}))
+        assert response.status_code == 200
+        assert b"Historique des signalements" in response.content
+
+    def test_ip_detail_invalid_ip(self, client):
+        response = client.get(reverse("ip_detail", kwargs={"ip_address": "invalid"}))
+        assert response.status_code == 404
+
+
+@pytest.mark.django_db
+class TestRechercherView:
+    """Tests for search view."""
+
+    def test_search_by_ip(self, client, ip_address_factory):
+        ip_address_factory(address="192.168.1.1")
+
+        response = client.post(
+            reverse("rechercher"),
+            {"recherche": "192.168.1.1"},
+        )
+        assert response.status_code == 200
+
+    def test_search_with_filters(self, client, ip_address_factory):
+        ip_address_factory(address="192.168.1.1")
+        ip_address_factory(address="2001:db8::1")
+
+        response = client.post(
+            reverse("rechercher"),
+            {"recherche": "", "filtres": "4"},
+        )
+        assert response.status_code == 200
