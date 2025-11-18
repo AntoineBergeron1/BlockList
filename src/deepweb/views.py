@@ -14,6 +14,7 @@ from django.db.models.functions import TruncDate, TruncHour
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.utils.timesince import timesince
 
 from .forms import LoginForm, RegisterForm, ReportForm, SearchForm
 from .models import IPAddress, Report, User
@@ -130,6 +131,80 @@ def ip_detail(request, ip_address):
     }
 
     return render(request, "deepweb/ip_detail.html", context)
+
+
+def ip_reports_api(request, ip_address):
+    """
+    API endpoint to fetch latest reports for an IP address.
+    Supports polling with 'since_id' parameter for real-time updates.
+    Returns JSON with new reports since the given ID.
+    """
+    try:
+        ipaddress.ip_address(ip_address)
+    except ValueError:
+        return JsonResponse({"error": "Adresse IP invalide"}, status=400)
+
+    try:
+        ip_obj = IPAddress.objects.get(address=ip_address)
+    except IPAddress.DoesNotExist:
+        return JsonResponse({"reports": [], "count": 0})
+
+    # Get 'since_id' parameter to fetch only new reports
+    since_id = request.GET.get("since_id")
+
+    # Build query
+    reports_query = ip_obj.reports.select_related("user").order_by("-created_at")
+
+    # Filter by since_id if provided (for polling)
+    if since_id:
+        try:
+            reports_query = reports_query.filter(id__gt=int(since_id))
+        except ValueError:
+            return JsonResponse({"error": "Invalid since_id parameter"}, status=400)
+
+    # Limit to last 10 new reports
+    reports = reports_query[:10]
+
+    # Serialize reports
+    reports_data = [
+        {
+            "id": report.id,
+            "user": report.user.username,
+            "date": report.created_at.strftime("%Y-%m-%d %H:%M"),
+            "date_iso": report.created_at.isoformat(),
+            "time_since": f"il y a {timesince(report.created_at)}",
+            "comment": report.comment or "",
+            "reason": report.get_reason_display(),
+        }
+        for report in reports
+    ]
+
+    all_reports = ip_obj.reports.all()
+    total_count = all_reports.count()
+    first_date = all_reports.aggregate(Min("created_at"))["created_at__min"]
+    last_date = all_reports.aggregate(Max("created_at"))["created_at__max"]
+
+    return JsonResponse(
+        {
+            "reports": reports_data,
+            "count": len(reports_data),
+            "latest_id": reports_data[0]["id"] if reports_data else None,
+            "statistics": {
+                "total_reports": total_count,
+                "first_report_date": (
+                    first_date.strftime("%d/%m/%Y") if first_date else "N/A"
+                ),
+                "last_report_date": (
+                    last_date.strftime("%d/%m/%Y") if last_date else "N/A"
+                ),
+            },
+            "ip_info": {
+                "reputation_score": ip_obj.reputation_score,
+                "created_at": ip_obj.created_at.strftime("%d/%m/%Y %H:%M"),
+                "updated_at": ip_obj.updated_at.strftime("%d/%m/%Y %H:%M"),
+            },
+        }
+    )
 
 
 @login_required
@@ -458,3 +533,15 @@ def statistics_threat_data(request):
     data = [item["count"] for item in threat_data]
 
     return JsonResponse({"labels": labels, "data": data})
+
+
+def profile_public_user(request, pk):
+    """Profile publique d'un utilisateur"""
+    utilisateur = get_object_or_404(User, id=pk)
+    reports = Report.objects.filter(user=utilisateur)
+
+    return render(
+        request,
+        "deepweb/profile_public_user.html",
+        {"utilisateur": utilisateur, "reports": reports},
+    )

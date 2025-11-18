@@ -11,6 +11,11 @@ urlpatterns = [
     path("search/", views.rechercher, name="rechercher"),
     path("user/", views.list_user, name="list_user"),
     path("user/<int:pk>", views.list_user_update, name="list_user_update"),
+    path(
+        "profilepublic/user/<int:pk>",
+        views.profile_public_user,
+        name="profile_public_user",
+    ),
     # IP and Report URLs
     path("check/<str:ip_address>/", views.ip_detail, name="ip_detail"),
     path("report/", views.report_ip, name="report_ip"),
@@ -19,6 +24,7 @@ urlpatterns = [
     path("statistics/", views.statistics, name="statistics"),
     # API endpoints
     path("api/chart/<str:ip_address>/", views.ip_chart_data, name="ip_chart_data"),
+    path("api/reports/<str:ip_address>/", views.ip_reports_api, name="ip_reports_api"),
     path(
         "api/statistics/chart/<str:timeframe>/",
         views.statistics_chart_data,

@@ -71,7 +71,7 @@ cp src/.env.example src/.env
 
 # 4. Lancer avec Docker (recommandé)
 cd deployment
-docker-compose up
+docker compose up
 ```
 
 L'application sera accessible à : http://127.0.0.1:8000/
@@ -123,7 +123,7 @@ Le déploiement est automatisé via GitHub Actions (CD) sur push vers la branche
 Pour le déploiement manuel :
 ```bash
 cd /home/deploy/app/deployment
-docker-compose up -d
+docker compose up -d
 ```
 
 # LICENCE
