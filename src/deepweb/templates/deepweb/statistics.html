@@ -1,0 +1,318 @@
+{% extends "deepweb/base.html" %}
+{% load static %}
+
+{% block title %}Statistiques - Blocklist{% endblock %}
+
+{% block contenu %}
+<div class="container">
+  <h1 class="mb-4"><b>Blocklist</b> — Statistiques de signalement</h1>
+
+  <!-- Report Counts Summary -->
+  <p class="lead">Nombre d'adresses IP signalées dans les dernières...</p>
+  <div class="table-responsive mb-5">
+    <table class="table table-bordered text-center">
+      <tbody>
+        <tr>
+          <td class="fs-4 fw-bold">{{ reports_last_hour|default:"0" }}</td>
+          <td class="fs-4 fw-bold">{{ reports_last_24h|default:"0" }}</td>
+          <td class="fs-4 fw-bold">{{ reports_last_7d|default:"0" }}</td>
+          <td class="fs-4 fw-bold">{{ reports_last_30d|default:"0" }}</td>
+        </tr>
+        <tr>
+          <th>1 Heure</th>
+          <th>24 Heures</th>
+          <th>7 Jours</th>
+          <th>30 Jours</th>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Tabs for Charts -->
+  <ul class="nav nav-tabs mb-3" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="lastDay-tab" data-bs-toggle="tab" data-bs-target="#lastDay" type="button" role="tab">
+        Signalements des dernières 24 heures
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="lastWeek-tab" data-bs-toggle="tab" data-bs-target="#lastWeek" type="button" role="tab">
+        Signalements des 7 derniers jours
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="lastMonth-tab" data-bs-toggle="tab" data-bs-target="#lastMonth" type="button" role="tab">
+        Signalements des 30 derniers jours
+      </button>
+    </li>
+  </ul>
+
+  <!-- Tab Content -->
+  <div class="tab-content mb-5">
+    <div class="tab-pane fade show active" id="lastDay" role="tabpanel">
+      <div id="chartDayContainer">
+        <canvas id="chartDay" style="max-height: 400px;"></canvas>
+        <div id="chartDayEmpty" class="alert alert-info text-center" style="display: none;">
+          <p class="mb-0">Aucune donnée disponible pour les dernières 24 heures.</p>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane fade" id="lastWeek" role="tabpanel">
+      <div id="chartWeekContainer">
+        <canvas id="chartWeek" style="max-height: 400px;"></canvas>
+        <div id="chartWeekEmpty" class="alert alert-info text-center" style="display: none;">
+          <p class="mb-0">Aucune donnée disponible pour les 7 derniers jours.</p>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane fade" id="lastMonth" role="tabpanel">
+      <div id="chartMonthContainer">
+        <canvas id="chartMonth" style="max-height: 400px;"></canvas>
+        <div id="chartMonthEmpty" class="alert alert-info text-center" style="display: none;">
+          <p class="mb-0">Aucune donnée disponible pour les 30 derniers jours.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Threat Types Distribution -->
+  <h3 class="mb-3">Distribution des types de menaces (7 derniers jours)</h3>
+  <div class="mb-5">
+    <div id="chartThreatsContainer">
+      <canvas id="chartThreats" style="max-height: 400px;"></canvas>
+      <div id="chartThreatsEmpty" class="alert alert-info text-center" style="display: none;">
+        <p class="mb-0">Aucune donnée disponible pour les types de menaces.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Reported IPs in Last 24 Hours -->
+  <h3 class="mb-3">Adresses IP les plus signalées (dernières 24 heures)</h3>
+  {% if top_ips_24h %}
+  <div class="row mb-5">
+    <div class="col-12">
+      <ol class="row">
+        {% for ip in top_ips_24h %}
+        <li class="col-md-6 mb-2">
+          <b><a href="{% url 'ip_detail' ip.ip_address__address %}">{{ ip.ip_address__address }}</a></b>
+          {% if ip.ip_address__hostname %}
+            <small class="text-muted">({{ ip.ip_address__hostname }})</small>
+          {% endif %}
+          <br>
+          <small>{{ ip.report_count }} signalement{{ ip.report_count|pluralize }} de {{ ip.unique_users }} utilisateur{{ ip.unique_users|pluralize }}</small>
+        </li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+  {% else %}
+  <p class="text-muted">Aucune IP signalée dans les dernières 24 heures.</p>
+  {% endif %}
+
+  <!-- Recently Reported IPs -->
+  <h3 class="mb-3">IPs récemment signalées</h3>
+  {% if recent_ips %}
+  <div class="row mb-5">
+    {% for ip in recent_ips %}
+    <div class="col-md-3 col-sm-6 mb-2">
+      <a href="{% url 'ip_detail' ip %}" class="text-decoration-none">{{ ip }}</a>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-muted">Aucune IP récemment signalée.</p>
+  {% endif %}
+
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Chart configuration
+  const chartColors = {
+    primary: 'rgba(54, 162, 235, 0.8)',
+    primaryBorder: 'rgba(54, 162, 235, 1)',
+    secondary: 'rgba(255, 99, 132, 0.8)',
+    secondaryBorder: 'rgba(255, 99, 132, 1)',
+    success: 'rgba(75, 192, 192, 0.8)',
+    successBorder: 'rgba(75, 192, 192, 1)',
+  };
+
+  const commonOptions = {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: {
+        display: false
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          precision: 0
+        }
+      }
+    }
+  };
+
+  // Chart instances
+  let chartDay = null;
+  let chartWeek = null;
+  let chartMonth = null;
+  let chartThreats = null;
+
+  // Load chart data function
+  async function loadChartData(timeframe, chartId) {
+    try {
+      const response = await fetch(`/api/statistics/chart/${timeframe}/`);
+      const data = await response.json();
+
+       const canvas = document.getElementById(chartId);
+      const emptyDiv = document.getElementById(`${chartId}Empty`);
+
+      // Check if data is empty
+      if (!data.labels || data.labels.length === 0) {
+        console.log(`No data for ${timeframe}`);
+        // Hide canvas, show empty message
+        canvas.style.display = 'none';
+        emptyDiv.style.display = 'block';
+        return;
+      }
+
+      // Show canvas, hide empty message
+      canvas.style.display = 'block';
+      emptyDiv.style.display = 'none';
+
+      const ctx = canvas.getContext('2d');
+
+      // Destroy existing chart if it exists
+      if (chartId === 'chartDay' && chartDay) chartDay.destroy();
+      if (chartId === 'chartWeek' && chartWeek) chartWeek.destroy();
+      if (chartId === 'chartMonth' && chartMonth) chartMonth.destroy();
+
+      const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'Signalements',
+            data: data.data,
+            backgroundColor: chartColors.primary,
+            borderColor: chartColors.primaryBorder,
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: commonOptions
+      });
+
+      // Store chart instance
+      if (chartId === 'chartDay') chartDay = chart;
+      if (chartId === 'chartWeek') chartWeek = chart;
+      if (chartId === 'chartMonth') chartMonth = chart;
+
+    } catch (error) {
+      console.error(`Error loading ${timeframe} data:`, error);
+      // Show error in empty div
+      const emptyDiv = document.getElementById(`${chartId}Empty`);
+      emptyDiv.innerHTML = '<p class="mb-0 text-danger">Erreur lors du chargement des données.</p>';
+      emptyDiv.style.display = 'block';
+      document.getElementById(chartId).style.display = 'none';
+    }
+  }
+
+  // Load threat distribution chart
+  async function loadThreatChart() {
+    try {
+      const response = await fetch('/api/statistics/threats/');
+      const data = await response.json();
+
+      const canvas = document.getElementById('chartThreats');
+      const emptyDiv = document.getElementById('chartThreatsEmpty');
+
+      // Check if data is empty
+      if (!data.labels || data.labels.length === 0) {
+        console.log('No threat data');
+        // Hide canvas, show empty message
+        canvas.style.display = 'none';
+        emptyDiv.style.display = 'block';
+        return;
+      }
+
+      // Show canvas, hide empty message
+      canvas.style.display = 'block';
+      emptyDiv.style.display = 'none';
+
+      const ctx = canvas.getContext('2d');
+
+      // Generate colors for each threat type
+      const colors = [
+        'rgba(255, 99, 132, 0.8)',
+        'rgba(54, 162, 235, 0.8)',
+        'rgba(255, 206, 86, 0.8)',
+        'rgba(75, 192, 192, 0.8)',
+        'rgba(153, 102, 255, 0.8)',
+        'rgba(255, 159, 64, 0.8)',
+        'rgba(199, 199, 199, 0.8)',
+        'rgba(83, 102, 255, 0.8)',
+        'rgba(255, 99, 255, 0.8)',
+      ];
+
+      chartThreats = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            data: data.data,
+            backgroundColor: colors.slice(0, data.labels.length),
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'right'
+            }
+          }
+        }
+      });
+
+    } catch (error) {
+      console.error('Error loading threat data:', error);
+      // Show error in empty div
+      const emptyDiv = document.getElementById('chartThreatsEmpty');
+      emptyDiv.innerHTML = '<p class="mb-0 text-danger">Erreur lors du chargement des données.</p>';
+      emptyDiv.style.display = 'block';
+      document.getElementById('chartThreats').style.display = 'none';
+    }
+  }
+
+  // Initial load
+  loadChartData('day', 'chartDay');
+  loadChartData('week', 'chartWeek');
+  loadChartData('month', 'chartMonth');
+  loadThreatChart();
+
+  // Handle tab switches
+  document.getElementById('lastDay-tab').addEventListener('shown.bs.tab', function() {
+    if (!chartDay) loadChartData('day', 'chartDay');
+  });
+
+  document.getElementById('lastWeek-tab').addEventListener('shown.bs.tab', function() {
+    if (!chartWeek) loadChartData('week', 'chartWeek');
+  });
+
+  document.getElementById('lastMonth-tab').addEventListener('shown.bs.tab', function() {
+    if (!chartMonth) loadChartData('month', 'chartMonth');
+  });
+});
+</script>
+
+{% endblock %}
