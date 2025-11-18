@@ -7,15 +7,14 @@ from django.conf import (  # TODO: Used for DEBUG in login view quick-login butt
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import check_password
 from django.core.files.storage import FileSystemStorage
 from django.db.models import Count, Max, Min
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.contrib.auth.hashers import check_password
-from .forms import LoginForm, RegisterForm, ReportForm, SearchForm, ModifierProfilForm
 from django.utils.timesince import timesince
 
-from .forms import LoginForm, RegisterForm, ReportForm, SearchForm
+from .forms import LoginForm, ModifierProfilForm, RegisterForm, ReportForm, SearchForm
 from .models import IPAddress, Report, User
 
 utilisateurs = User.objects.all()
@@ -209,8 +208,12 @@ def ip_reports_api(request, ip_address):
             "latest_id": reports_data[0]["id"] if reports_data else None,
             "statistics": {
                 "total_reports": total_count,
-                "first_report_date": first_date.strftime("%d/%m/%Y") if first_date else "N/A",
-                "last_report_date": last_date.strftime("%d/%m/%Y") if last_date else "N/A",
+                "first_report_date": (
+                    first_date.strftime("%d/%m/%Y") if first_date else "N/A"
+                ),
+                "last_report_date": (
+                    last_date.strftime("%d/%m/%Y") if last_date else "N/A"
+                ),
             },
             "ip_info": {
                 "reputation_score": ip_obj.reputation_score,
@@ -414,6 +417,18 @@ def ip_chart_data(request, ip_address):
     return JsonResponse(response_data)
 
 
+def profile_public_user(request, pk):
+    """Profile publique d'un utilisateur"""
+    utilisateur = get_object_or_404(User, id=pk)
+    reports = Report.objects.filter(user=utilisateur)
+
+    return render(
+        request,
+        "deepweb/profile_public_user.html",
+        {"utilisateur": utilisateur, "reports": reports},
+    )
+
+
 def mettre_a_jour_utilisateur(request, utilisateur):
     utilisateur.email = request.POST.get("email", utilisateur.email)
     utilisateur.first_name = request.POST.get("first_name", utilisateur.first_name)
@@ -461,9 +476,11 @@ def modifier_compte(request, id):
 
     return render(request, "deepweb/modifier_compte.html", {"form": form})
 
+
 def confirmer_suppression(request):
     """Confirmer la suppression d'un compte"""
     return render(request, "deepweb/confirmer_suppression.html")
+
 
 def supprimer_compte(request, id):
     """Supprimer le compte"""
