@@ -141,7 +141,7 @@ class Report(models.Model):
         (HACKING, "Hacking"),
         (WEB_APP_ATTACK, "Attaque d'application web"),
         (PORT_SCAN, "Scan de ports"),
-        (MALWARE, "Malware"),
+        (MALWARE, "Logiciel malveillant"),
         (PHISHING, "Hameçonnage"),
         (BRUTE_FORCE, "Attaque par force brute"),
         (DDoS, "Attaque DDoS"),

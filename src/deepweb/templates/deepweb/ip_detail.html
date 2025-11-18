@@ -13,9 +13,9 @@
       </div>
       <div class="card-body">
         <!-- Confidence Score Progress Bar -->
-        <p>Cette IP a été signalée <b>{{ total_reports }}</b> fois. Score de réputation : <b>{{ ip_address.reputation_score }}%</b></p>
+        <p>Cette IP a été signalée <b id="header-total-reports">{{ total_reports }}</b> fois. Score de réputation : <b id="header-reputation-score">{{ ip_address.reputation_score }}%</b></p>
         <div class="progress mb-3" style="height: 36px;">
-          <div class="progress-bar {% if ip_address.reputation_score >= 70 %}bg-success{% elif ip_address.reputation_score >= 40 %}bg-warning text-dark{% else %}bg-danger{% endif %}"
+          <div id="reputation-progress-bar" class="progress-bar {% if ip_address.reputation_score >= 70 %}bg-success{% elif ip_address.reputation_score >= 40 %}bg-warning text-dark{% else %}bg-danger{% endif %}"
                role="progressbar"
                style="width: {{ ip_address.reputation_score }}%; font-size: 16px; line-height: 36px; min-width: 3em;"
                aria-valuenow="{{ ip_address.reputation_score }}"
@@ -52,12 +52,12 @@
             <td>IPv{{ ip_address.version }}</td>
           </tr>
           <tr>
-            <th>Première apparition</th>
-            <td>{{ ip_address.created_at|date:"d/m/Y H:i" }}</td>
+            <th>Première vue le</th>
+            <td id="ip-created-at">{{ ip_address.created_at|date:"d/m/Y H:i" }}</td>
           </tr>
           <tr>
             <th>Dernière mise à jour</th>
-            <td>{{ ip_address.updated_at|date:"d/m/Y H:i" }}</td>
+            <td id="ip-updated-at">{{ ip_address.updated_at|date:"d/m/Y H:i" }}</td>
           </tr>
         </table>
       </div>
@@ -85,20 +85,20 @@
         <div class="row text-center">
           <div class="col-md-4">
             <div class="stat-item">
-              <h3 class="text-primary">{{ total_reports }}</h3>
-              <p class="text-muted">Signalements au total</p>
+              <h3 class="text-primary" id="total-reports-count">{{ total_reports }}</h3>
+              <p class="text-muted">Total des signalements</p>
             </div>
           </div>
           <div class="col-md-4">
             <div class="stat-item">
               <p class="text-muted mb-0">Premier signalement</p>
-              <p class="fw-bold">{{ first_report_date|date:"d/m/Y"|default:"N/A" }}</p>
+              <p class="fw-bold" id="first-report-date">{{ first_report_date|date:"d/m/Y"|default:"N/A" }}</p>
             </div>
           </div>
           <div class="col-md-4">
             <div class="stat-item">
               <p class="text-muted mb-0">Dernier signalement</p>
-              <p class="fw-bold">{{ last_report_date|date:"d/m/Y"|default:"N/A" }}</p>
+              <p class="fw-bold" id="last-report-date">{{ last_report_date|date:"d/m/Y"|default:"N/A" }}</p>
             </div>
           </div>
         </div>
@@ -118,7 +118,7 @@
             Types de menaces
           </button>
           <button type="button" class="btn btn-outline-primary chart-view-btn" data-view="topUsers">
-            Top utilisateurs
+            Top contributeurs
           </button>
         </div>
       </div>
@@ -141,8 +141,12 @@
 
     <!-- Reports List -->
     <div class="card">
-      <div class="card-header">
+      <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Historique des signalements pour {{ ip_address.address }}</h5>
+        <div id="live-update-indicator" class="text-muted small" style="display: none;">
+          <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+          Mise à jour automatique
+        </div>
       </div>
       <div class="card-body">
         {% if reports %}
@@ -157,9 +161,9 @@
                   <th style="width: 20%;" class="text-end">Raison</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="reports-tbody">
                 {% for report in reports %}
-                  <tr>
+                  <tr data-report-id="{{ report.id }}">
                     <td>
                       <a href="#" class="text-decoration-none">
                         {{ report.user.username }}
@@ -233,13 +237,152 @@
 <script src="{% static 'deepweb/js/ip-charts.js' %}"></script>
 
 <script>
-// AJAX Load More functionality (to be implemented)
+// AJAX Live Updates for Reports
 document.addEventListener('DOMContentLoaded', function() {
-  const loadMoreBtn = document.getElementById('load-more-btn');
-  if (loadMoreBtn) {
-    loadMoreBtn.addEventListener('click', function() {
-      // AJAX implementation will go here
-      console.log('Load more clicked - AJAX to be implemented');
+  const ipAddress = '{{ ip_address.address }}';
+  const reportsTbody = document.getElementById('reports-tbody');
+  const liveIndicator = document.getElementById('live-update-indicator');
+  let latestReportId = null;
+  let pollInterval = null;
+
+  // Get the latest report ID from the current table
+  function getLatestReportId() {
+    const firstRow = reportsTbody.querySelector('tr[data-report-id]');
+    return firstRow ? parseInt(firstRow.dataset.reportId) : null;
+  }
+
+  // Initialize latest ID
+  latestReportId = getLatestReportId();
+
+  function updateStatistics(statistics) {
+    const totalCount = document.getElementById('total-reports-count');
+    const firstDate = document.getElementById('first-report-date');
+    const lastDate = document.getElementById('last-report-date');
+
+    if (totalCount) totalCount.textContent = statistics.total_reports;
+    if (firstDate) firstDate.textContent = statistics.first_report_date;
+    if (lastDate) lastDate.textContent = statistics.last_report_date;
+  }
+
+  function updateIPInfo(ipInfo, totalReports) {
+    const headerTotalReports = document.getElementById('header-total-reports');
+    const headerReputationScore = document.getElementById('header-reputation-score');
+    const reputationProgressBar = document.getElementById('reputation-progress-bar');
+    const ipCreatedAt = document.getElementById('ip-created-at');
+    const ipUpdatedAt = document.getElementById('ip-updated-at');
+
+    if (headerTotalReports && totalReports !== undefined) {
+      headerTotalReports.textContent = totalReports;
+    }
+
+    if (headerReputationScore) {
+      headerReputationScore.textContent = ipInfo.reputation_score + '%';
+    }
+
+    if (reputationProgressBar) {
+      reputationProgressBar.style.width = ipInfo.reputation_score + '%';
+      reputationProgressBar.textContent = ipInfo.reputation_score + '%';
+      reputationProgressBar.setAttribute('aria-valuenow', ipInfo.reputation_score);
+
+      reputationProgressBar.className = 'progress-bar';
+      if (ipInfo.reputation_score >= 70) {
+        reputationProgressBar.classList.add('bg-success');
+      } else if (ipInfo.reputation_score >= 40) {
+        reputationProgressBar.classList.add('bg-warning', 'text-dark');
+      } else {
+        reputationProgressBar.classList.add('bg-danger');
+      }
+    }
+
+    if (ipCreatedAt) ipCreatedAt.textContent = ipInfo.created_at;
+    if (ipUpdatedAt) ipUpdatedAt.textContent = ipInfo.updated_at;
+  }
+
+  function addNewReports(reports) {
+    if (reports.length === 0) return;
+
+    liveIndicator.style.display = 'block';
+    setTimeout(() => {
+      liveIndicator.style.display = 'none';
+    }, 2000);
+
+    reports.reverse().forEach(report => {
+      const newRow = document.createElement('tr');
+      newRow.dataset.reportId = report.id;
+      newRow.className = 'table-success';
+      newRow.innerHTML = `
+        <td>
+          <a href="#" class="text-decoration-none">
+            ${report.user}
+          </a>
+        </td>
+        <td>
+          <time datetime="${report.date_iso}">
+            ${report.date}
+            <br>
+            <small class="text-muted">(${report.time_since})</small>
+          </time>
+        </td>
+        <td>
+          <div style="max-width: 400px;">
+            ${report.comment ? report.comment : '<span class="text-muted fst-italic">Aucun commentaire</span>'}
+          </div>
+        </td>
+        <td class="text-end">
+          <span class="badge bg-secondary">${report.reason}</span>
+        </td>
+      `;
+
+      reportsTbody.insertBefore(newRow, reportsTbody.firstChild);
+
+      setTimeout(() => {
+        newRow.classList.remove('table-success');
+      }, 3000);
+    });
+
+    latestReportId = reports[reports.length - 1].id;
+  }
+
+  // Function to poll for new reports
+  async function pollForNewReports() {
+    if (!latestReportId) return;
+
+    try {
+      const url = `/api/reports/${ipAddress}/?since_id=${latestReportId}`;
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        console.error('Failed to fetch reports:', response.status);
+        return;
+      }
+
+      const data = await response.json();
+
+      if (data.statistics) {
+        updateStatistics(data.statistics);
+      }
+
+      if (data.ip_info) {
+        updateIPInfo(data.ip_info, data.statistics ? data.statistics.total_reports : undefined);
+      }
+
+      if (data.count > 0) {
+        addNewReports(data.reports);
+      }
+    } catch (error) {
+      console.error('Error polling for reports:', error);
+    }
+  }
+
+  // Start polling every 10 seconds
+  if (reportsTbody) {
+    pollInterval = setInterval(pollForNewReports, 10000);
+
+    // Stop polling when user leaves the page
+    window.addEventListener('beforeunload', () => {
+      if (pollInterval) {
+        clearInterval(pollInterval);
+      }
     });
   }
 });
