@@ -1,8 +1,24 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
+from django.forms.widgets import Select
 
 from .models import IPAddress, Report, User
+
+
+class SelectWithDisabledOption(Select):
+    """Custom Select widget that allows disabling specific options"""
+
+    def create_option(
+        self, name, value, label, selected, index, subindex=None, attrs=None
+    ):
+        option = super().create_option(
+            name, value, label, selected, index, subindex, attrs
+        )
+        # Disable the empty option (value='')
+        if value == "":
+            option["attrs"]["disabled"] = "disabled"
+        return option
 
 
 class RegisterForm(UserCreationForm):
@@ -146,7 +162,7 @@ class ReportForm(forms.ModelForm):
         model = Report
         fields = ["ip_address", "reason", "comment"]
         widgets = {
-            "reason": forms.Select(attrs={"class": "form-control"}),
+            "reason": SelectWithDisabledOption(attrs={"class": "form-control"}),
             "comment": forms.Textarea(
                 attrs={
                     "class": "form-control",
