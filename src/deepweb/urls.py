@@ -8,7 +8,14 @@ urlpatterns = [
     path("accounts/register/", views.register, name="register"),
     path("accounts/login/", views.connecter, name="connecter"),
     path("accounts/logout/", views.deconnecter, name="deconnecter"),
+    path(
+        "confirmer_suppression/",
+        views.confirmer_suppression,
+        name="confirmer_suppression",
+    ),
+    path("supprimer_compte/<int:id>/", views.supprimer_compte, name="supprimer_compte"),
     path("search/", views.rechercher, name="rechercher"),
+    path("compte/<int:id>/", views.modifier_compte, name="modifier_compte"),
     path("user/", views.list_user, name="list_user"),
     path("user/<int:pk>", views.list_user_update, name="list_user_update"),
     path(

@@ -8,6 +8,7 @@ from django.conf import (  # TODO: Used for DEBUG in login view quick-login butt
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import check_password
 from django.core.files.storage import FileSystemStorage
 from django.db.models import Count, Max, Min
 from django.db.models.functions import TruncDate, TruncHour
@@ -16,7 +17,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.timesince import timesince
 
-from .forms import LoginForm, RegisterForm, ReportForm, SearchForm
+from .forms import LoginForm, RegisterForm, ReportForm, SearchForm, UpdateProfileForm
 from .models import IPAddress, Report, User
 
 utilisateurs = User.objects.all()
@@ -47,17 +48,37 @@ def register(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            messages.success(request, "Compte créé avec succès !")
+            username = form.cleaned_data["username"]
+            password = form.cleaned_data["password1"]
+            email = form.cleaned_data["email"]
 
-            return redirect("connecter")
+            try:
+                user = User.objects.get(username=username)
+                if not user.is_active:
+                    if check_password(password, user.password):
+                        user.is_active = True
+                        user.email = email
+                        user.save()
+                        messages.success(request, "Compte réactivé avec succès !")
+                        login(request, user)
+                        return redirect("connecter")
+                    else:
+                        messages.error(
+                            request, "Mot de passe incorrect pour réactivation."
+                        )
+                        return render(request, "deepweb/register.html", {"form": form})
+                else:
+                    messages.error(request, "Nom d'utilisateur déjà pris.")
+                    return render(request, "deepweb/register.html", {"form": form})
+            except User.DoesNotExist:
+                user = form.save()
+                login(request, user)
+                messages.success(request, "Compte créé avec succès !")
+                return redirect("connecter")
         else:
             messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
-
     else:
         form = RegisterForm()
-
     return render(request, "deepweb/register.html", {"form": form})
 
 
@@ -80,7 +101,6 @@ def connecter(request):
     else:
         form = LoginForm()
 
-    # TODO: Remove 'debug' context when removing quick-login development buttons
     return render(
         request, "deepweb/login.html", {"form": form, "debug": settings.DEBUG}
     )
@@ -551,3 +571,72 @@ def profile_public_user(request, pk):
         "deepweb/profile_public_user.html",
         {"utilisateur": utilisateur, "reports": reports},
     )
+
+
+def mettre_a_jour_utilisateur(request, utilisateur):
+    utilisateur.email = request.POST.get("email", utilisateur.email)
+    utilisateur.first_name = request.POST.get("first_name", utilisateur.first_name)
+    utilisateur.last_name = request.POST.get("last_name", utilisateur.last_name)
+    password = request.POST.get("password")
+    password_confirm = request.POST.get("password_confirm")
+    if password and password_confirm:
+        if password == password_confirm:
+            utilisateur.set_password(password)
+        else:
+            utilisateur.password = utilisateur.password
+
+    utilisateur.save()
+
+
+def modifier_compte(request, id):
+    """Modifier le profile utilisatreur"""
+    utilisateur = request.user
+    if not utilisateur.is_authenticated:
+        messages.error(request, "Vous devez être connecté pour modifier votre profil.")
+        return redirect("connecter")
+    if utilisateur.id != id:
+        messages.error(request, "Vous n'avez pas accès à cette page.")
+        return redirect("index")
+
+    if request.method == "POST":
+        form = UpdateProfileForm(request.POST, instance=utilisateur)
+        password = request.POST.get("password")
+        password_confirm = request.POST.get("password_confirm")
+        if form.is_valid():
+            if password == password_confirm:
+                mettre_a_jour_utilisateur(request, utilisateur)
+                form.save()
+                messages.success(request, "Profil mis à jour avec succès !")
+                return redirect("modifier_compte", id=id)
+
+            else:
+                messages.error(request, "Les mots de passe ne correspondent pas.")
+                return render(request, "deepweb/modifier_compte.html", {"form": form})
+
+        else:
+            messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
+    else:
+        form = UpdateProfileForm(instance=utilisateur)
+
+    return render(request, "deepweb/modifier_compte.html", {"form": form})
+
+
+def confirmer_suppression(request):
+    """Confirmer la suppression d'un compte"""
+    return render(request, "deepweb/confirmer_suppression.html")
+
+
+def supprimer_compte(request, id):
+    """Supprimer le compte"""
+    utilisateur = request.user
+    if not utilisateur.is_authenticated:
+        messages.error(request, "Vous devez être connecté pour supprimer votre profil.")
+        return redirect("modifier_compte", id=id)
+    if utilisateur.id != id:
+        messages.error(request, "Vous n'avez pas accès à cette page.")
+        return redirect("modifier_compte", id=id)
+    if request.method == "POST":
+        utilisateur.is_active = False
+        utilisateur.save()
+        messages.success(request, "Votre compte a été supprimé avec succès.")
+        return redirect("index")
