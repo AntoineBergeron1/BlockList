@@ -6,7 +6,13 @@ from django.contrib.auth import get_user_model
 
 import pytest
 
-from deepweb.forms import RegisterForm, ReportForm, UpdateProfileForm
+from deepweb.forms import (
+    LoginForm,
+    RegisterForm,
+    ReportForm,
+    SearchForm,
+    UpdateProfileForm,
+)
 from deepweb.models import IPAddress, Report
 
 from .factories import IPAddressFactory, UserFactory
@@ -330,6 +336,85 @@ class TestRegisterForm:
         assert user.last_name == "Name"
         assert user.is_active is True
         assert user.check_password("newpass123!")
+
+
+@pytest.mark.unit
+class TestLoginForm:
+    """Tests for LoginForm."""
+
+    def test_valid_credentials(self):
+        form_data = {
+            "username": "testuser",
+            "password": "testpass123",
+        }
+        form = LoginForm(data=form_data)
+        assert form.is_valid()
+
+    def test_missing_username(self):
+        form = LoginForm(data={"password": "testpass123"})
+        assert not form.is_valid()
+        assert "username" in form.errors
+        assert len(form.errors["username"]) > 0
+
+    def test_missing_password(self):
+        form = LoginForm(data={"username": "testuser"})
+        assert not form.is_valid()
+        assert "password" in form.errors
+        assert len(form.errors["password"]) > 0
+
+    def test_empty_form(self):
+        form = LoginForm(data={})
+        assert not form.is_valid()
+        assert len(form.errors) == 2
+
+
+@pytest.mark.unit
+class TestSearchForm:
+    """Tests for SearchForm."""
+
+    def test_valid_search(self):
+        form = SearchForm(
+            data={
+                "recherche": "192.168.1.1",
+                "tries": "default",
+                "filtres": "4",
+            }
+        )
+        assert form.is_valid()
+
+    def test_all_fields_optional(self):
+        form = SearchForm(data={})
+        assert form.is_valid()
+
+    def test_ipv6_filter(self):
+        form = SearchForm(data={"filtres": "6"})
+        assert form.is_valid()
+        assert form.cleaned_data["filtres"] == "6"
+
+    def test_ipv4_filter(self):
+        form = SearchForm(data={"filtres": "4"})
+        assert form.is_valid()
+        assert form.cleaned_data["filtres"] == "4"
+
+    def test_sort_choices(self):
+        sort_options = [
+            "default",
+            "creationCroissant",
+            "creationDecroissant",
+            "modificationCroissant",
+            "modificationDecroissant",
+            "reputationCroissant",
+            "reputationDecroissant",
+        ]
+        for sort_option in sort_options:
+            form = SearchForm(data={"tries": sort_option})
+            assert form.is_valid()
+            assert form.cleaned_data["tries"] == sort_option
+
+    def test_search_with_ip(self):
+        form = SearchForm(data={"recherche": "10.0.0.1"})
+        assert form.is_valid()
+        assert form.cleaned_data["recherche"] == "10.0.0.1"
 
 
 @pytest.mark.django_db
