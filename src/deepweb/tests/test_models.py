@@ -1,8 +1,11 @@
 """
 Unit tests for deepweb models.
 """
-import pytest
+
 from django.core.exceptions import ValidationError
+
+import pytest
+
 from deepweb.models import IPAddress, Report
 
 
@@ -36,7 +39,9 @@ class TestIPAddressModel:
         ip.calculate_reputation()
         assert ip.reputation_score == 100
 
-    def test_reputation_calculation_with_reports(self, ip_address_factory, report_factory):
+    def test_reputation_calculation_with_reports(
+        self, ip_address_factory, report_factory
+    ):
         """Test reputation decreases with reports."""
         ip = ip_address_factory()
 
@@ -74,10 +79,7 @@ class TestReportModel:
 
         # Create a report
         Report.objects.create(
-            ip_address=ip,
-            user=user,
-            reason=Report.SPAM,
-            comment="Test spam report"
+            ip_address=ip, user=user, reason=Report.SPAM, comment="Test spam report"
         )
 
         # Refresh IP from database

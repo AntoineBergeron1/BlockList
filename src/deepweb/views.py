@@ -311,12 +311,14 @@ def ip_chart_data(request, ip_address):
 
     return JsonResponse(response_data)
 
-def profile_public_user(request,pk):
+
+def profile_public_user(request, pk):
     """Profile publique d'un utilisateur"""
     utilisateur = get_object_or_404(User, id=pk)
     reports = Report.objects.filter(user=utilisateur)
 
     return render(
-        request, "deepweb/profile_public_user.html", {"utilisateur": utilisateur, "reports":reports}
+        request,
+        "deepweb/profile_public_user.html",
+        {"utilisateur": utilisateur, "reports": reports},
     )
-
