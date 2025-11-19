@@ -51,6 +51,11 @@ class IPChartManager {
   }
 
   createChart() {
+    if (!this.chartData) {
+      this.showError('Aucune donnée disponible pour afficher les graphiques.');
+      return;
+    }
+
     const ctx = this.canvas.getContext('2d');
 
     this.chart = new Chart(ctx, {
@@ -58,6 +63,8 @@ class IPChartManager {
       data: this.getChartDataForView('timeline'),
       options: this.getChartOptions('timeline')
     });
+
+    this.canvas.style.display = 'block';
   }
 
   getChartDataForView(view) {
@@ -232,6 +239,12 @@ class IPChartManager {
     }
   }
 
+  hideError() {
+    if (this.errorEl) {
+      this.errorEl.style.display = 'none';
+    }
+  }
+
   async refreshChartData() {
     try {
       const url = `/api/chart/${this.ipAddress}/`;
@@ -247,7 +260,12 @@ class IPChartManager {
 
       if (oldDataStr !== newDataStr) {
         this.chartData = newData;
-        if (this.chart) {
+
+        // If chart doesn't exist yet (was 0 reports), create it now
+        if (!this.chart && this.chartData) {
+          this.hideError();
+          this.createChart();
+        } else if (this.chart) {
           const newChartData = this.getChartDataForView(this.currentView);
           this.chart.data.labels = newChartData.labels;
           this.chart.data.datasets = newChartData.datasets;
