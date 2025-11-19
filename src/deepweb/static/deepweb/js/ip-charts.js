@@ -18,11 +18,9 @@ class IPChartManager {
 
   async init() {
     await this.loadChartData();
-    if (this.chartData) {
-      this.createChart();
-      this.attachEventListeners();
-      this.startAutoRefresh();
-    }
+    this.createChart();
+    this.attachEventListeners();
+    this.startAutoRefresh();
   }
 
   async loadChartData() {
@@ -37,12 +35,6 @@ class IPChartManager {
 
       this.chartData = await response.json();
       this.showLoading(false);
-
-      // Check if all datasets are empty
-      if (this.isAllDataEmpty()) {
-        this.showError('Aucune donnée disponible pour afficher les graphiques.');
-        return;
-      }
     } catch (error) {
       console.error('Failed to load chart data:', error);
       this.showError('Impossible de charger les données du graphique.');
