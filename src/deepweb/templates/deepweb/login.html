@@ -18,6 +18,8 @@
 <input class="btn btn-primary" type="submit" value="Se connecter">
 </form>
 
+{% comment %}
+Quick Login buttons - Commented out for production demo
 {% if debug %}
 <div class="mt-4">
     <p class="text-muted small">Quick Login (Development):</p>
@@ -53,5 +55,6 @@ function fillLogin(username, password) {
 }
 </script>
 {% endif %}
+{% endcomment %}
 
 {% endblock %}
