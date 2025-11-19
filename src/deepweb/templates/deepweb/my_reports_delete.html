@@ -1,0 +1,51 @@
+{% extends "deepweb/base.html" %} {% block contenu %}
+
+<h1>Confirmer la suppression</h1>
+<p>Voulez-vous vraiment supprimer le signalement :</p>
+<table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>Adresse IP</th>
+          <th>Date</th>
+          <th>Commentaire</th>
+          <th>Raison</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <a
+              href="{% url 'ip_detail' report.ip_address %}"
+              class="text-decoration-none"
+            >
+              {{ report.ip_address }}
+            </a>
+          </td>
+          <td>
+            <time datetime="{{ report.created_at|date:'c' }}">
+              {{ report.created_at|date:"Y-m-d H:i" }}
+            </time>
+          </td>
+          <td>
+            <div>
+              {% if report.comment %} {{ report.comment }} {% else %}
+              <span>Aucun commentaire</span>
+              {% endif %}
+            </div>
+          </td>
+          <td class="text-end">
+            <span class="badge bg-warning"
+              >{{ report.get_reason_display }}</span
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Supprimer</button>
+    <a href="{% url 'my_reports' %}" class="btn btn-secondary">Annuler</a>
+</form>
+
+{% endblock %}

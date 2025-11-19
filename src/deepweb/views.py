@@ -572,6 +572,36 @@ def profile_public_user(request, pk):
         {"utilisateur": utilisateur, "reports": reports},
     )
 
+@login_required
+def my_reports(request):
+    """Report d'un utilisateur"""
+    utilisateur = request.user
+    reports = Report.objects.filter(user=utilisateur)
+
+    if request.method == "GET":
+        report_id = request.GET.get("report_id")
+
+        if report_id:
+            return redirect('my_reports_delete', pk=report_id)
+
+
+    return render(
+        request,
+        "deepweb/my_reports.html",
+        {"utilisateur": utilisateur, "reports": reports},
+    )
+
+@login_required
+def my_reports_delete(request, pk):
+    """Supprimer son report"""
+    report = get_object_or_404(Report, id=pk, user=request.user)
+
+    if request.method == "POST":
+        report.delete()
+        messages.success(request, "Signalement supprimé")
+        return redirect("my_reports")
+
+    return render(request, "deepweb/my_reports_delete.html", {"report":report})
 
 def mettre_a_jour_utilisateur(request, utilisateur):
     utilisateur.email = request.POST.get("email", utilisateur.email)
