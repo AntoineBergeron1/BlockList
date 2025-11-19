@@ -127,7 +127,6 @@
     </div>
 
     <!-- Interactive Charts -->
-    {% if total_reports > 0 %}
     <div class="card mb-4" id="chart-container" data-ip-address="{{ ip_address.address }}">
       <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Analyse des signalements</h5>
@@ -158,7 +157,6 @@
         <canvas id="ip-chart" style="display: none;"></canvas>
       </div>
     </div>
-    {% endif %}
 
     <!-- Reports List -->
     <div class="card">
