@@ -30,3 +30,13 @@ repos:
       - id: flake8
         exclude: ^src/deepweb/migrations/
         args: ['--config=.flake8']
+
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v9.18.0
+    hooks:
+      - id: eslint
+        files: \.js$
+        types: [file]
+        args: ['--config', 'src/eslint.config.js']
+        additional_dependencies:
+          - eslint@9.18.0

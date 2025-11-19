@@ -30,6 +30,22 @@ pip install -r requirements.txt
 echo "📦 Installing Node.js dependencies..."
 npm install --production
 
+# Download GeoIP databases if not present
+echo "🌍 Checking GeoIP databases..."
+if [ ! -f /app/src/geoip_data/GeoLite2-City.mmdb ] || [ ! -f /app/src/geoip_data/GeoLite2-ASN.mmdb ]; then
+    if [ -n "$MAXMIND_LICENSE_KEY" ]; then
+        echo "📥 Downloading MaxMind GeoIP databases..."
+        cd /app/src/geoip_data
+        bash download_geoip.sh "$MAXMIND_LICENSE_KEY"
+        cd /app/src
+        echo "✅ GeoIP databases downloaded"
+    else
+        echo "⚠️  WARNING: MAXMIND_LICENSE_KEY not set, GeoIP enrichment will not work"
+    fi
+else
+    echo "✅ GeoIP databases already present"
+fi
+
 # Clean up any stale migration issues
 echo "🧹 Cleaning up migrations if needed..."
 python manage.py migrate --fake-initial 2>/dev/null || true

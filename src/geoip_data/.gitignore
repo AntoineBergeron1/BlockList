@@ -2,6 +2,7 @@
 *.mmdb
 *.tar.gz
 *.zip
+GeoLite2-*/
 
 # Keep this directory
 !.gitignore

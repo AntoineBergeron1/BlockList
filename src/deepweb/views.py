@@ -129,6 +129,10 @@ def ip_detail(request, ip_address):
     if not ip_obj.hostname:
         ip_obj.lookup_hostname()
 
+    # Enrich with GeoIP data if not already enriched
+    if not ip_obj.country_code and not ip_obj.asn:
+        ip_obj.enrich_geoip()
+
     # Get reports with statistics
     reports = ip_obj.reports.select_related("user").order_by("-created_at")
 

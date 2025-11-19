@@ -48,6 +48,9 @@ services:
       DB_HOST: db
       DB_PORT: 5432
 
+      # MaxMind GeoIP2
+      MAXMIND_LICENSE_KEY: ${MAXMIND_LICENSE_KEY:-}
+
       # Redis cache (désactivé pour le moment)
       # REDIS_URL: redis://redis:6379/1
 

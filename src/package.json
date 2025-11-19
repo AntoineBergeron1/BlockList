@@ -3,9 +3,17 @@
   "version": "0.1.0",
   "description": "BlockList - IP Reputation and Reporting System",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.3.8",
     "chart.js": "4.5.1"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.1"
+  },
+  "scripts": {
+    "lint": "eslint static/deepweb/js/**/*.js",
+    "lint:fix": "eslint static/deepweb/js/**/*.js --fix"
   }
 }

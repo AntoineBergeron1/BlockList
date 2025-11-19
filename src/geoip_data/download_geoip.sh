@@ -20,12 +20,12 @@ echo "Downloading MaxMind GeoLite2 databases..."
 
 # Download GeoLite2-City
 echo "→ Downloading GeoLite2-City..."
-curl -o GeoLite2-City.tar.gz \
+curl -L -o GeoLite2-City.tar.gz \
     "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=${LICENSE_KEY}&suffix=tar.gz"
 
 # Download GeoLite2-ASN
 echo "→ Downloading GeoLite2-ASN..."
-curl -o GeoLite2-ASN.tar.gz \
+curl -L -o GeoLite2-ASN.tar.gz \
     "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-ASN&license_key=${LICENSE_KEY}&suffix=tar.gz"
 
 # Extract .mmdb files

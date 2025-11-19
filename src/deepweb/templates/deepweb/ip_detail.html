@@ -28,24 +28,45 @@
         <!-- IP Info Table -->
         <table class="table table-sm">
           <tr>
-            <th style="width: 30%;">ISP</th>
-            <td>À venir</td>
+            <th style="width: 30%;">Pays</th>
+            <td>
+              {% if ip_address.country_name %}
+                {{ ip_address.country_name }} ({{ ip_address.country_code }})
+              {% else %}
+                Non disponible
+              {% endif %}
+            </td>
           </tr>
           <tr>
-            <th>Type d'utilisation</th>
-            <td>À venir</td>
+            <th>Ville</th>
+            <td>{{ ip_address.city|default:"Non disponible" }}</td>
+          </tr>
+          <tr>
+            <th>Coordonnées</th>
+            <td>
+              {% if ip_address.latitude and ip_address.longitude %}
+                {{ ip_address.latitude }}, {{ ip_address.longitude }}
+              {% else %}
+                Non disponible
+              {% endif %}
+            </td>
           </tr>
           <tr>
             <th>ASN</th>
-            <td>À venir</td>
+            <td>
+              {% if ip_address.asn %}
+                AS{{ ip_address.asn }}
+                {% if ip_address.asn_organization %}
+                  - {{ ip_address.asn_organization }}
+                {% endif %}
+              {% else %}
+                Non disponible
+              {% endif %}
+            </td>
           </tr>
           <tr>
             <th>Nom de domaine</th>
             <td>{{ ip_address.hostname|default:"Non disponible" }}</td>
-          </tr>
-          <tr>
-            <th>Pays</th>
-            <td>À venir</td>
           </tr>
           <tr>
             <th>Version IP</th>
@@ -247,6 +268,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Get the latest report ID from the current table
   function getLatestReportId() {
+    if (!reportsTbody) return null;
     const firstRow = reportsTbody.querySelector('tr[data-report-id]');
     return firstRow ? parseInt(firstRow.dataset.reportId) : null;
   }
