@@ -580,10 +580,15 @@ def my_reports(request):
     reports = Report.objects.filter(user=utilisateur)
 
     if request.method == "POST":
-        report_id = request.POST.get("report_id")
+        report_ids = request.POST.getlist("report_ids")
 
-        if report_id:
-            return redirect("my_reports_delete", pk=report_id)
+        if report_ids:
+            Report.objects.filter(id__in=report_ids, user=utilisateur).delete()
+            messages.success(
+                request,
+                f"{len(report_ids)} signalement(s) supprimé(s) avec succès",
+            )
+            return redirect("my_reports")
 
     return render(
         request,
