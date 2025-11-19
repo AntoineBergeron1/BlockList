@@ -21,7 +21,7 @@ watchdog==6.0.0
 wheel==0.45.1
 
 # GeoIP2 for IP geolocation
-geoip2==4.8.1
+geoip2==5.1.0
 maxminddb==2.6.2
 
 # Testing dependencies
