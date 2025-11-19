@@ -409,14 +409,15 @@ class TestIPDetailView:
         assert response.status_code == 404
 
     def test_ip_detail_with_zero_reports(self, client, ip_address_factory):
-        """Test IP detail with no reports (edge case for JavaScript)."""
+        """Test IP detail with no reports (AJAX requires tbody to exist)."""
         ip = ip_address_factory(address="192.168.1.1")
         response = client.get(reverse("ip_detail", kwargs={"ip_address": ip.address}))
 
         assert response.status_code == 200
         assert b"Aucun signalement" in response.content
-        # Ensure reports-tbody doesn't exist when no reports
-        assert b'id="reports-tbody"' not in response.content
+        # reports-tbody must exist for AJAX polling to work
+        assert b'id="reports-tbody"' in response.content
+        assert b'id="no-reports-row"' in response.content
 
 
 @pytest.mark.django_db
