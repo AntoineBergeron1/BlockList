@@ -16,7 +16,7 @@ from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.timesince import timesince
-
+import json
 from .forms import LoginForm, RegisterForm, ReportForm, SearchForm, UpdateProfileForm
 from .models import IPAddress, Report, User
 
@@ -681,3 +681,12 @@ def supprimer_compte(request, id):
         utilisateur.save()
         messages.success(request, "Votre compte a été supprimé avec succès.")
         return redirect("index")
+
+
+def check_email(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        email = data.get("email")
+        exists = User.objects.filter(email=email, is_active=True).exists()
+        return JsonResponse({"exists": exists})
+    return JsonResponse({"exists": False})
