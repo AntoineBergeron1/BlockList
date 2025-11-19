@@ -603,8 +603,9 @@ def modifier_compte(request, id):
         password = request.POST.get("password")
         password_confirm = request.POST.get("password_confirm")
         if form.is_valid():
-            if password == password_confirm:
-                mettre_a_jour_utilisateur(request, utilisateur)
+            if password or password_confirm:
+                if password == password_confirm:
+                    mettre_a_jour_utilisateur(request, utilisateur)
                 form.save()
                 messages.success(request, "Profil mis à jour avec succès !")
                 return redirect("modifier_compte", id=id)
