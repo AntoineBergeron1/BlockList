@@ -274,7 +274,7 @@ class SearchForm(forms.Form):
         required=False,
         widget=forms.TextInput(
             attrs={
-                "class": "form-control m-1",
+                "class": "form-control form-control-lg",
                 "placeholder": "Entrez une adresse IP...",
             }
         ),
@@ -282,8 +282,7 @@ class SearchForm(forms.Form):
 
     tries = forms.ChoiceField(
         choices=[
-            ("default", "Trier par : (Par défaut)"),
-            ("creationCroissant", "Date de création (croissante)"),
+            ("default", "Date de création croissante (Défaut)"),
             ("creationDecroissant", "Date de création (décroissante)"),
             ("modificationCroissant", "Date de modification (croissante)"),
             ("modificationDecroissant", "Date de modification (décroissante)"),
@@ -291,7 +290,11 @@ class SearchForm(forms.Form):
             ("reputationDecroissant", "Réputation (décroissante)"),
         ],
         label="",
-        widget=forms.Select(attrs={"class": "form-control m-1"}),
+        widget=forms.Select(
+            attrs={
+                "class": "form-select form-select-lg",
+            }
+        ),
         required=False,
     )
 
@@ -301,6 +304,6 @@ class SearchForm(forms.Form):
             ("6", "IPV6"),
         ],
         label="",
-        widget=forms.RadioSelect(attrs={"class": "m-1"}),
+        widget=forms.RadioSelect(attrs={"class": "d-flex m-3"}),
         required=False,
     )
