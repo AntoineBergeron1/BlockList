@@ -32,5 +32,5 @@ factory-boy==3.3.3
 pytest-factoryboy==2.8.1
 
 # Code quality tools
-pre-commit==4.4.0
+pre-commit==4.5.0
 flake8==7.3.0
