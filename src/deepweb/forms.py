@@ -24,6 +24,16 @@ class SelectWithDisabledOption(Select):
 
 
 class RegisterForm(UserCreationForm):
+    username = forms.CharField(
+        max_length=150,
+        required=True,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        help_text=None,
+        error_messages={
+            "required": "Le nom d'utilisateur est obligatoire",
+        },
+        label="Nom d'utilisateur : ",
+    )
     email = forms.EmailField(
         required=True,
         widget=forms.EmailInput(attrs={"class": "form-control"}),
