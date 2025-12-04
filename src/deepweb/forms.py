@@ -142,6 +142,11 @@ class LoginForm(forms.Form):
 
 
 class UpdateProfileForm(forms.ModelForm):
+    username = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control", "readonly": "readonly"}),
+        label="Nom d'utilisateur",
+    )
     first_name = forms.CharField(
         required=True,
         widget=forms.TextInput(attrs={"class": "form-control"}),
@@ -178,6 +183,7 @@ class UpdateProfileForm(forms.ModelForm):
     class Meta:
         model = User
         fields = [
+            "username",
             "first_name",
             "last_name",
             "email",
