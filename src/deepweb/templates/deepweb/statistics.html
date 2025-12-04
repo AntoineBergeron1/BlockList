@@ -126,7 +126,7 @@
 </div>
 
 <!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="{% static 'chart.js/dist/chart.umd.js' %}"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -294,23 +294,33 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // Initial load
+  // Initial load - only load visible charts
   loadChartData('day', 'chartDay');
-  loadChartData('week', 'chartWeek');
-  loadChartData('month', 'chartMonth');
   loadThreatChart();
 
-  // Handle tab switches
+  // Handle tab switches - lazy load charts when tab becomes visible
   document.getElementById('lastDay-tab').addEventListener('shown.bs.tab', function() {
-    if (!chartDay) loadChartData('day', 'chartDay');
+    if (chartDay) {
+      chartDay.resize();
+    } else {
+      loadChartData('day', 'chartDay');
+    }
   });
 
   document.getElementById('lastWeek-tab').addEventListener('shown.bs.tab', function() {
-    if (!chartWeek) loadChartData('week', 'chartWeek');
+    if (chartWeek) {
+      chartWeek.resize();
+    } else {
+      loadChartData('week', 'chartWeek');
+    }
   });
 
   document.getElementById('lastMonth-tab').addEventListener('shown.bs.tab', function() {
-    if (!chartMonth) loadChartData('month', 'chartMonth');
+    if (chartMonth) {
+      chartMonth.resize();
+    } else {
+      loadChartData('month', 'chartMonth');
+    }
   });
 });
 </script>
