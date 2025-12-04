@@ -1,6 +1,7 @@
 import ipaddress
 import os
 from datetime import datetime, timedelta
+from multiprocessing import managers
 
 from django.conf import (  # TODO: Used for DEBUG in login view quick-login buttons
     settings,
@@ -10,8 +11,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
 from django.core.files.storage import FileSystemStorage
-from django.db.models import Count, Max, Min
-from django.db.models.functions import TruncDate, TruncHour
+from django.db.models import CharField, Count, F, Max, Min
+from django.db.models.functions import Cast, TruncDate, TruncHour
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -37,7 +38,7 @@ def index(request):
         "deepweb/index.html",
         {
             "form": form,
-            "results": IPAddress.objects.all(),
+            "results": IPAddress.objects.all().order_by("-created_at"),
             "reports": reports,
             "recent_reports": recent_reports,
         },
@@ -309,10 +310,9 @@ def rechercher(request):
             resultat_recherche = form.cleaned_data["recherche"]
             optiontri = form.cleaned_data.get("tries")
             if resultat_recherche:
-                results = []
-                for ip in IPAddress.objects.all():
-                    if resultat_recherche in ip.address:
-                        results.append(ip)
+                results = IPAddress.objects.annotate(
+                    addr_str=Cast(F("address"), output_field=CharField())
+                ).filter(addr_str__icontains=resultat_recherche)
             else:
                 results = IPAddress.objects.all()
 
@@ -320,26 +320,17 @@ def rechercher(request):
                 results = results.filter(version=versionSelectionnee)
                 print(versionSelectionnee)
 
-            if optiontri == "reputationCroissant":
+            if optiontri == "reputationDesc":
                 results = results.order_by("-reputation_score")
-            elif optiontri == "reputationDecroissant":
+            elif optiontri == "reputationAsc":
                 results = results.order_by("reputation_score")
-            elif optiontri == "creationCroissant":
-                results = results.order_by("created_at")
-            elif optiontri == "creationDecroissant":
-                results = results.order_by("-created_at")
-            elif optiontri == "modificationCroissant":
-                results = results.order_by("updated_at")
-            elif optiontri == "modificationDecroissant":
+            elif optiontri == "modificationDesc":
                 results = results.order_by("-updated_at")
-            elif optiontri == "default":
-                results = results
-
             else:
-                results = IPAddress.objects.none()
+                results = results.order_by("-created_at")
 
         else:
-            results = IPAddress.objects.all()
+            results = IPAddress.objects.all().order_by("-created_at")
 
     return render(
         request,
@@ -644,8 +635,9 @@ def modifier_compte(request, id):
         password = request.POST.get("password")
         password_confirm = request.POST.get("password_confirm")
         if form.is_valid():
-            if password == password_confirm:
-                mettre_a_jour_utilisateur(request, utilisateur)
+            if password and password_confirm:
+                if password == password_confirm:
+                    mettre_a_jour_utilisateur(request, utilisateur)
                 form.save()
                 messages.success(request, "Profil mis à jour avec succès !")
                 return redirect("modifier_compte", id=id)

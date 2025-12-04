@@ -16,14 +16,22 @@
 
   <form
     method="POST"
-    class="d-flex justify-content-center"
+    class="d-flex justify-content-center align-items-center gap-2"
     id="formRecherche"
     role="search"
     action="{% url 'rechercher' %}"
     novalidate
-  >
-    {% csrf_token %} {{form}}
-    <button class="btn btn-primary btn-outline-light" type="submit">
+>
+    {% csrf_token %}
+    {{ form.recherche }}
+
+    {{ form.tries }}
+
+    <div class="d-flex align-items-center">
+      {{ form.filtres }}
+    </div>
+
+    <button class="btn btn-primary btn-outline-light" type="submit" aria-label="Rechercher">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="16"
@@ -37,7 +45,10 @@
         />
       </svg>
     </button>
-  </form>
+
+    <input type="reset" class="btn btn-secondary" value="Réinitialiser" aria-label="Réinitialiser le formulaire" />
+</form>
+
 
   <ul class="list-unstyled">
     {% for ip in results %}

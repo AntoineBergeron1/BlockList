@@ -399,12 +399,9 @@ class TestSearchForm:
     def test_sort_choices(self):
         sort_options = [
             "default",
-            "creationCroissant",
-            "creationDecroissant",
-            "modificationCroissant",
-            "modificationDecroissant",
-            "reputationCroissant",
-            "reputationDecroissant",
+            "reputationDesc",
+            "reputationAsc",
+            "modificationDesc",
         ]
         for sort_option in sort_options:
             form = SearchForm(data={"tries": sort_option})
