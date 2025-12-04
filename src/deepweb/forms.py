@@ -282,12 +282,10 @@ class SearchForm(forms.Form):
 
     tries = forms.ChoiceField(
         choices=[
-            ("default", "Date de création croissante (Défaut)"),
-            ("creationDecroissant", "Date de création (décroissante)"),
-            ("modificationCroissant", "Date de modification (croissante)"),
-            ("modificationDecroissant", "Date de modification (décroissante)"),
-            ("reputationCroissant", "Réputation (croissante)"),
-            ("reputationDecroissant", "Réputation (décroissante)"),
+            ("default", "Plus récents (Défaut)"),
+            ("reputationDesc", "Réputation (pire d'abord)"),
+            ("reputationAsc", "Réputation (meilleur d'abord)"),
+            ("modificationDesc", "Dernière modification"),
         ],
         label="",
         widget=forms.Select(

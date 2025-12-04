@@ -1,21 +1,18 @@
 import ipaddress
 import os
 from datetime import datetime, timedelta
+from multiprocessing import managers
 
 from django.conf import (  # TODO: Used for DEBUG in login view quick-login buttons
     settings,
 )
-from django.db.models import F
-from django.db.models.functions import Cast
-from django.db.models import CharField
-from multiprocessing import managers
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
 from django.core.files.storage import FileSystemStorage
-from django.db.models import Count, Max, Min
-from django.db.models.functions import TruncDate, TruncHour
+from django.db.models import CharField, Count, F, Max, Min
+from django.db.models.functions import Cast, TruncDate, TruncHour
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -41,7 +38,7 @@ def index(request):
         "deepweb/index.html",
         {
             "form": form,
-            "results": IPAddress.objects.all().order_by("created_at"),
+            "results": IPAddress.objects.all().order_by("-created_at"),
             "reports": reports,
             "recent_reports": recent_reports,
         },
@@ -93,9 +90,7 @@ def connecter(request):
             username = form.cleaned_data["username"]
             password = form.cleaned_data["password"]
 
-            user = authenticate(
-                request, str.upper(username) == str.upper(username), password=password
-            )
+            user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
                 messages.success(request, "Connecté avec succès !")
@@ -321,24 +316,17 @@ def rechercher(request):
                 results = results.filter(version=versionSelectionnee)
                 print(versionSelectionnee)
 
-            if optiontri == "reputationCroissant":
+            if optiontri == "reputationDesc":
                 results = results.order_by("-reputation_score")
-            elif optiontri == "reputationDecroissant":
+            elif optiontri == "reputationAsc":
                 results = results.order_by("reputation_score")
-            elif optiontri == "creationDecroissant":
-                results = results.order_by("-created_at")
-            elif optiontri == "modificationCroissant":
-                results = results.order_by("updated_at")
-            elif optiontri == "modificationDecroissant":
+            elif optiontri == "modificationDesc":
                 results = results.order_by("-updated_at")
-            elif optiontri == "default":
-                results = results.order_by("created_at")
-
             else:
-                results = IPAddress.objects.none()
+                results = results.order_by("-created_at")
 
         else:
-            results = IPAddress.objects.all().order_by("created_at")
+            results = IPAddress.objects.all().order_by("-created_at")
 
     return render(
         request,
