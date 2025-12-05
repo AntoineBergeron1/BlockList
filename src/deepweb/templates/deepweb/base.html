@@ -36,7 +36,7 @@
         </button>
 
         <div
-          class="collapse navbar-collapse justify-content-end"
+          class="collapse navbar-collapse"
           id="navbarContent"
         >
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -48,31 +48,6 @@
             </li>
           </ul>
 
-          <div>
-            {% if user.is_authenticated %} {% if user.is_staff %}
-            <a class="btn btn-primary" href="{% url 'list_user' %}"
-              >Utilisateurs</a
-            >
-            {% endif %}
-            <a
-              class="btn btn-primary"
-              href="{% url 'modifier_compte' user.id %}"
-              >Modifier mon compte</a
-            >
-            <a class="btn btn-primary" href="{% url 'my_reports' %}">Mes signalements</a>
-            <a class="btn btn-primary" href="{% url 'deconnecter' %}"
-              >Se déconnecter</a
-            >
-            {% else %}
-            <a class="btn btn-outline-light me-2" href="{% url 'connecter' %}"
-              >Se connecter</a
-            >
-            <a class="btn btn-outline-light" href="{% url 'register' %}"
-              >Créer un compte</a
-            >
-            {% endif %}
-          </div>
-
           <form
             class="d-flex me-3"
             id="formRecherche"
@@ -83,7 +58,7 @@
             <input
               class="form-control me-2"
               type="search"
-              placeholder="Rechercher"
+              placeholder="Rechercher une IP"
               aria-label="Search"
             />
             <button class="btn btn-outline-light" type="submit">
@@ -101,6 +76,31 @@
               </svg>
             </button>
           </form>
+
+          <div class="d-flex align-items-center">
+            {% if user.is_authenticated %} {% if user.is_staff %}
+            <a class="btn btn-outline-light me-2" href="{% url 'list_user' %}"
+              >Utilisateurs</a
+            >
+            {% endif %}
+            <a
+              class="btn btn-outline-light me-2"
+              href="{% url 'modifier_compte' user.id %}"
+              >Modifier mon compte</a
+            >
+            <a class="btn btn-outline-light me-2" href="{% url 'my_reports' %}">Mes signalements</a>
+            <a class="btn btn-outline-danger" href="{% url 'deconnecter' %}"
+              >Se déconnecter</a
+            >
+            {% else %}
+            <a class="btn btn-outline-light me-2" href="{% url 'connecter' %}"
+              >Se connecter</a
+            >
+            <a class="btn btn-primary" href="{% url 'register' %}"
+              >Créer un compte</a
+            >
+            {% endif %}
+          </div>
         </div>
       </div>
     </nav>
