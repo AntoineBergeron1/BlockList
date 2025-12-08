@@ -78,12 +78,14 @@
             id="formRecherche"
             role="search"
             method="POST"
+            action="{% url 'navbar_search' %}"
           >
             {% csrf_token %}
             <input
               class="form-control me-2"
               type="search"
-              placeholder="Rechercher"
+              name="q"
+              placeholder="Rechercher une IP..."
               aria-label="Search"
             />
             <button class="btn btn-outline-light" type="submit">
