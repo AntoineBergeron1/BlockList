@@ -46,7 +46,7 @@
 <!-- Search Card -->
 <div class="card shadow-sm mb-4">
   <div class="card-body py-4">
-    <form method="POST" id="formRecherche" role="search" action="{% url 'rechercher' %}" novalidate>
+    <form method="POST" id="formRecherche" role="search" action="{% url 'index' %}" novalidate>
       {% csrf_token %}
       <div class="row g-3 align-items-center justify-content-center">
         <div class="col-md-5">

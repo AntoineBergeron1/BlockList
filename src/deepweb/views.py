@@ -40,13 +40,44 @@ def index(request):
         "total_users": User.objects.filter(is_active=True).count(),
     }
 
-    form = SearchForm()
+    # Handle search on homepage (POST)
+    if request.method == "POST":
+        form = SearchForm(request.POST)
+        if form.is_valid():
+            versionSelectionnee = form.cleaned_data.get("filtres")
+            resultat_recherche = form.cleaned_data["recherche"]
+            optiontri = form.cleaned_data.get("tries")
+
+            if resultat_recherche:
+                results = IPAddress.objects.annotate(
+                    addr_str=Cast(F("address"), output_field=CharField())
+                ).filter(addr_str__icontains=resultat_recherche)
+            else:
+                results = IPAddress.objects.all()
+
+            if versionSelectionnee:
+                results = results.filter(version=versionSelectionnee)
+
+            if optiontri == "reputationDesc":
+                results = results.order_by("-reputation_score")
+            elif optiontri == "reputationAsc":
+                results = results.order_by("reputation_score")
+            elif optiontri == "modificationDesc":
+                results = results.order_by("-updated_at")
+            else:
+                results = results.order_by("-created_at")
+        else:
+            results = IPAddress.objects.all().order_by("-created_at")
+    else:
+        form = SearchForm()
+        results = IPAddress.objects.all().order_by("-created_at")
+
     return render(
         request,
         "deepweb/index.html",
         {
             "form": form,
-            "results": IPAddress.objects.all().order_by("-created_at"),
+            "results": results,
             "reports": reports,
             "recent_reports": recent_reports,
             "stats": stats,
@@ -309,48 +340,8 @@ def list_user_update(request, pk):
 
 
 def rechercher(request):
-    if request.method == "POST":
-        recent_reports = Report.objects.all().order_by("-created_at")[:9]
-
-        form = SearchForm(request.POST)
-        if form.is_valid():
-
-            versionSelectionnee = form.cleaned_data.get("filtres")
-            resultat_recherche = form.cleaned_data["recherche"]
-            optiontri = form.cleaned_data.get("tries")
-            if resultat_recherche:
-                results = IPAddress.objects.annotate(
-                    addr_str=Cast(F("address"), output_field=CharField())
-                ).filter(addr_str__icontains=resultat_recherche)
-            else:
-                results = IPAddress.objects.all()
-
-            if versionSelectionnee:
-                results = results.filter(version=versionSelectionnee)
-                print(versionSelectionnee)
-
-            if optiontri == "reputationDesc":
-                results = results.order_by("-reputation_score")
-            elif optiontri == "reputationAsc":
-                results = results.order_by("reputation_score")
-            elif optiontri == "modificationDesc":
-                results = results.order_by("-updated_at")
-            else:
-                results = results.order_by("-created_at")
-
-        else:
-            results = IPAddress.objects.all().order_by("-created_at")
-
-    return render(
-        request,
-        "deepweb/index.html",
-        {
-            "form": form,
-            "results": results,
-            "reports": reports,
-            "recent_reports": recent_reports,
-        },
-    )
+    """Legacy search URL - redirect to homepage which now handles search."""
+    return redirect("index")
 
 
 def ip_chart_data(request, ip_address):
