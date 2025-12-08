@@ -343,6 +343,52 @@ def list_user_update(request, pk):
     return redirect("list_user")
 
 
+def navbar_search(request):
+    """
+    Handle navbar search: redirect to IP detail if valid IP,
+    otherwise perform a search.
+    """
+    if request.method == "POST":
+        query = request.POST.get("q", "").strip()
+
+        if query:
+            # Check if it's a valid IP address
+            try:
+                ipaddress.ip_address(query)
+                # Valid IP - redirect to IP detail page
+                return redirect("ip_detail", ip_address=query)
+            except ValueError:
+                # Not a valid IP - perform search
+                pass
+
+            # Search for IPs containing the query
+            results = (
+                IPAddress.objects.annotate(
+                    addr_str=Cast(F("address"), output_field=CharField())
+                )
+                .filter(addr_str__icontains=query)
+                .order_by("-created_at")
+            )
+        else:
+            results = IPAddress.objects.all().order_by("-created_at")
+
+        recent_reports = Report.objects.all().order_by("-created_at")[:9]
+        form = SearchForm(initial={"recherche": query})
+
+        return render(
+            request,
+            "deepweb/index.html",
+            {
+                "form": form,
+                "results": results,
+                "reports": reports,
+                "recent_reports": recent_reports,
+            },
+        )
+
+    return redirect("index")
+
+
 def rechercher(request):
     """Legacy search URL - redirect to homepage which now handles search."""
     return redirect("index")

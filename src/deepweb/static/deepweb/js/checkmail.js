@@ -4,6 +4,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!emailInput) return;
 
+  // Basic email format validation
+  const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
   let feedback = document.createElement("div");
   feedback.id = "email-feedback";
   feedback.style.marginTop = "5px";
@@ -14,10 +19,11 @@ document.addEventListener("DOMContentLoaded", () => {
   emailInput.addEventListener("input", () => {
     clearTimeout(timeout);
 
-    const email = emailInput.value;
+    const email = emailInput.value.trim();
 
     timeout = setTimeout(async () => {
-      if (email.length < 3) {
+      // Only check if email format is valid
+      if (!isValidEmail(email)) {
         feedback.textContent = "";
         return;
       }

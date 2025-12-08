@@ -15,6 +15,7 @@ urlpatterns = [
     ),
     path("supprimer_compte/<int:id>/", views.supprimer_compte, name="supprimer_compte"),
     path("search/", views.rechercher, name="rechercher"),
+    path("navbar-search/", views.navbar_search, name="navbar_search"),
     path("compte/<int:id>/", views.modifier_compte, name="modifier_compte"),
     path("compte/reports/", views.my_reports, name="my_reports"),
     path(
@@ -29,7 +30,7 @@ urlpatterns = [
         views.profile_public_user,
         name="profile_public_user",
     ),
-     path('check-email/', views.check_email, name='check_email'),
+    path("check-email/", views.check_email, name="check_email"),
     # IP and Report URLs
     path("check/<str:ip_address>/", views.ip_detail, name="ip_detail"),
     path("report/", views.report_ip, name="report_ip"),
