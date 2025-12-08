@@ -260,6 +260,15 @@ class Report(models.Model):
             # Recalculate reputation after new report
             self.ip_address.calculate_reputation()
 
+    def delete(self, *args, **kwargs):
+        """
+        Override delete to recalculate IP reputation after deleting a report.
+        """
+        ip = self.ip_address
+        super().delete(*args, **kwargs)
+        # Recalculate reputation after report deletion
+        ip.calculate_reputation()
+
 
 class CIDRField(models.Field):
     """
