@@ -1,13 +1,4 @@
-{% extends "deepweb/base.html" %} {% block contenu %} {% if messages %}
-<ul class="messages list-unstyled">
-  {% for message in messages %}
-  <li {% if message.tags %} class="alert alert-{{ message.tags }} " {% endif %}>
-    {{ message }}
-  </li>
-  {% endfor %}
-</ul>
-{% endif %}
-
+{% extends "deepweb/base.html" %} {% block contenu %}
 <h1>BlockList</h1>
 <p><strong>BlockList</strong> est un service communautaire pour rechercher et signaler des adresses IP suspectes.</p>
 
