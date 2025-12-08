@@ -73,6 +73,13 @@ fi
 echo "👤 Creating test users..."
 python manage.py create_test_users || true
 
+# Set up cron job for daily reputation recalculation
+echo "Setting up cron job for reputation recalculation..."
+apt-get update -qq && apt-get install -y -qq cron > /dev/null 2>&1
+echo "0 3 * * * cd /app/src && /usr/local/bin/python manage.py recalculate_reputation >> /var/log/reputation_cron.log 2>&1" | crontab -
+service cron start
+echo "Cron job configured (runs daily at 3 AM)"
+
 echo "✅ Django setup complete!"
 
 # Start Django development server

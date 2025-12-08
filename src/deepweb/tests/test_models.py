@@ -109,3 +109,48 @@ class TestReportModel:
         Report.objects.create(ip_address=ip, user=user, reason=Report.HACKING)
         ip.refresh_from_db()
         assert ip.reputation_score == 90
+
+    def test_delete_report_increases_reputation(self, ip_address_factory, user_factory):
+        """Test that deleting a report increases IP reputation."""
+        ip = ip_address_factory()
+        user = user_factory()
+
+        # Create 2 reports
+        report1 = Report.objects.create(ip_address=ip, user=user, reason=Report.SPAM)
+        Report.objects.create(ip_address=ip, user=user, reason=Report.HACKING)
+
+        ip.refresh_from_db()
+        score_with_2_reports = ip.reputation_score
+
+        # Delete one report
+        report1.delete()
+
+        ip.refresh_from_db()
+        # Score should have increased
+        assert ip.reputation_score > score_with_2_reports
+
+    def test_reputation_decay_ignores_old_reports(
+        self, ip_address_factory, user_factory
+    ):
+        """Test that reports older than max_age_days are ignored."""
+        from datetime import timedelta
+
+        from django.utils import timezone
+
+        ip = ip_address_factory()
+        user = user_factory()
+
+        # Create a report
+        report = Report.objects.create(ip_address=ip, user=user, reason=Report.SPAM)
+
+        # Manually set the report date to 35 days ago
+        old_date = timezone.now() - timedelta(days=35)
+        Report.objects.filter(pk=report.pk).update(created_at=old_date)
+
+        # Recalculate with 30 day max age - old report should be ignored
+        ip.calculate_reputation(max_age_days=30)
+        assert ip.reputation_score == 100
+
+        # Recalculate with 60 day max age - old report should count
+        ip.calculate_reputation(max_age_days=60)
+        assert ip.reputation_score < 100
