@@ -292,6 +292,7 @@ class SearchForm(forms.Form):
             attrs={
                 "class": "form-control form-control-lg",
                 "placeholder": "Entrez une adresse IP...",
+                "aria-label": "Rechercher une adresse IP",
             }
         ),
     )
@@ -307,6 +308,7 @@ class SearchForm(forms.Form):
         widget=forms.Select(
             attrs={
                 "class": "form-select form-select-lg",
+                "aria-label": "Trier les résultats",
             }
         ),
         required=False,
@@ -314,10 +316,16 @@ class SearchForm(forms.Form):
 
     filtres = forms.ChoiceField(
         choices=[
-            ("4", "IPV4"),
-            ("6", "IPV6"),
+            ("", "Tous"),
+            ("4", "IPv4"),
+            ("6", "IPv6"),
         ],
         label="",
-        widget=forms.RadioSelect(attrs={"class": "d-flex m-3"}),
+        widget=forms.Select(
+            attrs={
+                "class": "form-select form-select-lg",
+                "aria-label": "Filtrer par version IP",
+            }
+        ),
         required=False,
     )

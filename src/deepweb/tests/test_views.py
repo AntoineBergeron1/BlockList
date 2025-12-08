@@ -422,13 +422,13 @@ class TestIPDetailView:
 
 @pytest.mark.django_db
 class TestRechercherView:
-    """Tests for search view."""
+    """Tests for search view (now handled by index)."""
 
     def test_search_by_ip(self, client, ip_address_factory):
         ip_address_factory(address="192.168.1.1")
 
         response = client.post(
-            reverse("rechercher"),
+            reverse("index"),
             {"recherche": "192.168.1.1"},
         )
         assert response.status_code == 200
@@ -438,7 +438,13 @@ class TestRechercherView:
         ip_address_factory(address="2001:db8::1")
 
         response = client.post(
-            reverse("rechercher"),
+            reverse("index"),
             {"recherche": "", "filtres": "4"},
         )
         assert response.status_code == 200
+
+    def test_legacy_search_url_redirects(self, client):
+        """Test that /search/ redirects to homepage."""
+        response = client.get(reverse("rechercher"))
+        assert response.status_code == 302
+        assert response.url == reverse("index")

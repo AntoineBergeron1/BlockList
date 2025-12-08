@@ -5,11 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Plateforme d'activités" />
-    <title>{% block title %} {% endblock %}</title>
+    <title>{% block title %}BlockList - Signalement d'IP malveillantes{% endblock %}</title>
 
     <!-- Bootstrap core CSS -->
     <link
       href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}"
+      rel="stylesheet"
+    />
+
+    <!-- Flag icons CSS -->
+    <link
+      href="{% static 'flag-icons/css/flag-icons.min.css' %}"
       rel="stylesheet"
     />
 
@@ -50,7 +56,7 @@
 
           <form
             class="d-flex me-3"
-            id="formRecherche"
+            id="navbarSearchForm"
             role="search"
             method="POST"
             action="{% url 'navbar_search' %}"
@@ -61,9 +67,9 @@
               type="search"
               name="q"
               placeholder="Rechercher une IP..."
-              aria-label="Search"
+              aria-label="Rechercher une adresse IP"
             />
-            <button class="btn btn-outline-light" type="submit">
+            <button class="btn btn-outline-light" type="submit" aria-label="Rechercher">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -124,7 +130,7 @@
     </nav>
 
     <!-- Main content -->
-    <main role="main" class="container py-5 mt-5">
+    <main class="container py-5 mt-5">
       {% if messages %}
       <div class="messages-container">
         {% for message in messages %}
