@@ -104,22 +104,42 @@ class IPAddress(models.Model):
         self.clean()
         super().save(*args, **kwargs)
 
-    def calculate_reputation(self):
+    def calculate_reputation(self, max_age_days=30):
         """
-        Calculate reputation score based on reports.
+        Calculate reputation score based on reports with time decay.
         Base score: 100
-        Each report decreases the score (weighted by severity).
+        Reports lose weight over time (3% per day).
+        Reports older than max_age_days are ignored.
         """
-        reports = self.reports.all()
-        total_reports = reports.count()
+        from datetime import timedelta
 
-        if total_reports == 0:
+        from django.utils import timezone
+
+        # Only consider reports within the max age period
+        cutoff_date = timezone.now() - timedelta(days=max_age_days)
+        recent_reports = self.reports.filter(created_at__gte=cutoff_date)
+
+        if not recent_reports.exists():
             self.reputation_score = 100
         else:
-            # Basic calculation: lose 5 points per report, minimum 0
-            self.reputation_score = max(0, 100 - (total_reports * 5))
+            total_penalty = 0
+            now = timezone.now()
 
-        self.save()
+            for report in recent_reports:
+                # Calculate age in days
+                age_days = (now - report.created_at).total_seconds() / 86400
+
+                # Decay: report loses 3% of its value per day
+                # A report starts at weight 1.0 and decays to ~0.4 at 30 days
+                decay_factor = max(0, 1 - (age_days * 0.02))
+
+                # Base penalty is 5 points per report, adjusted by decay
+                total_penalty += 5 * decay_factor
+
+            # Calculate final score (minimum 0)
+            self.reputation_score = max(0, int(100 - total_penalty))
+
+        self.save(update_fields=["reputation_score", "updated_at"])
         return self.reputation_score
 
     def lookup_hostname(self):
@@ -259,6 +279,15 @@ class Report(models.Model):
         if is_new:
             # Recalculate reputation after new report
             self.ip_address.calculate_reputation()
+
+    def delete(self, *args, **kwargs):
+        """
+        Override delete to recalculate IP reputation after deleting a report.
+        """
+        ip = self.ip_address
+        super().delete(*args, **kwargs)
+        # Recalculate reputation after report deletion
+        ip.calculate_reputation()
 
 
 class CIDRField(models.Field):
