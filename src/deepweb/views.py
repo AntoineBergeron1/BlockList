@@ -1,4 +1,5 @@
 import ipaddress
+import json
 import os
 from datetime import datetime, timedelta
 from multiprocessing import managers
@@ -17,7 +18,7 @@ from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.timesince import timesince
-import json
+
 from .forms import LoginForm, RegisterForm, ReportForm, SearchForm, UpdateProfileForm
 from .models import IPAddress, Report, User
 
@@ -32,6 +33,13 @@ def index(request):
     """Voir les dernières ip reportées sur la page accueil"""
     recent_reports = Report.objects.all().order_by("-created_at")[:9]
 
+    # Stats for homepage
+    stats = {
+        "total_ips": IPAddress.objects.count(),
+        "total_reports": Report.objects.count(),
+        "total_users": User.objects.filter(is_active=True).count(),
+    }
+
     form = SearchForm()
     return render(
         request,
@@ -41,6 +49,7 @@ def index(request):
             "results": IPAddress.objects.all().order_by("-created_at"),
             "reports": reports,
             "recent_reports": recent_reports,
+            "stats": stats,
         },
     )
 
