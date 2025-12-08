@@ -66,11 +66,15 @@ def index(request):
                 results = results.order_by("-updated_at")
             else:
                 results = results.order_by("-created_at")
+
+            # Limit search results to 50
+            results = results[:50]
         else:
-            results = IPAddress.objects.all().order_by("-created_at")
+            results = IPAddress.objects.all().order_by("-created_at")[:20]
     else:
         form = SearchForm()
-        results = IPAddress.objects.all().order_by("-created_at")
+        # Homepage default: show last 20 IPs
+        results = IPAddress.objects.all().order_by("-created_at")[:20]
 
     return render(
         request,
