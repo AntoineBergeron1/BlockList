@@ -53,12 +53,14 @@
             id="formRecherche"
             role="search"
             method="POST"
+            action="{% url 'navbar_search' %}"
           >
             {% csrf_token %}
             <input
               class="form-control me-2"
               type="search"
-              placeholder="Rechercher une IP"
+              name="q"
+              placeholder="Rechercher une IP..."
               aria-label="Search"
             />
             <button class="btn btn-outline-light" type="submit">
@@ -123,6 +125,16 @@
 
     <!-- Main content -->
     <main role="main" class="container py-5 mt-5">
+      {% if messages %}
+      <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
       {% block contenu %} {% endblock %}
     </main>
 
