@@ -298,10 +298,11 @@ class SearchForm(forms.Form):
 
     filtres = forms.ChoiceField(
         choices=[
-            ("4", "IPV4"),
-            ("6", "IPV6"),
+            ("", "Tous"),
+            ("4", "IPv4"),
+            ("6", "IPv6"),
         ],
         label="",
-        widget=forms.RadioSelect(attrs={"class": "d-flex m-3"}),
+        widget=forms.Select(attrs={"class": "form-select form-select-lg"}),
         required=False,
     )

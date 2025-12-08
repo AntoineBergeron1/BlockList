@@ -27,9 +27,7 @@
 
     {{ form.tries }}
 
-    <div class="d-flex align-items-center">
-      {{ form.filtres }}
-    </div>
+    {{ form.filtres }}
 
     <button class="btn btn-primary btn-outline-light" type="submit" aria-label="Rechercher">
       <svg
@@ -55,11 +53,13 @@
     <li>
       <div class="card">
         <div class="card-body ">
-        <div class="d-flex justify-content-around" >
-            <h4><a href="{% url 'ip_detail' ip.address %}" class="text-decoration-none">IPV{{ip.version}} : {{ip.address}}</a></h4>
-            <p>Score {{ip.reputation_score}}/100</p>
-            <p>Création : {{ip.created_at.year}}-{{ip.created_at.month}}-{{ip.created_at.day}}</p>
-
+        <div class="d-flex justify-content-around align-items-center">
+            <h4>
+              {% if ip.country_code %}<span class="fi fi-{{ ip.country_code|lower }} me-2" title="{{ ip.country_name }}"></span>{% else %}<span class="fi fi-un me-2" title="Pays inconnu"></span>{% endif %}
+              <a href="{% url 'ip_detail' ip.address %}" class="text-decoration-none">{{ ip.address }}</a>
+            </h4>
+            <p>Score {{ ip.reputation_score }}/100</p>
+            <p>Création : {{ ip.created_at|date:"Y-m-d" }}</p>
         </div>
 
 
@@ -80,8 +80,11 @@
                 <div class="card m-2">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h3 class="card-title"><a href="{% url 'ip_detail' report.ip_address %}">{{report.ip_address}}</a></h3>
-                            <p class="badge bg-warning">{{report.reason}}</p>
+                            <h3 class="card-title">
+                              {% if report.ip_address.country_code %}<span class="fi fi-{{ report.ip_address.country_code|lower }} me-2" title="{{ report.ip_address.country_name }}"></span>{% else %}<span class="fi fi-un me-2" title="Pays inconnu"></span>{% endif %}
+                              <a href="{% url 'ip_detail' report.ip_address %}">{{ report.ip_address }}</a>
+                            </h3>
+                            <p class="badge bg-warning">{{ report.reason }}</p>
                         </div>
                     </div>
                 </div>
