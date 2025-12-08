@@ -1,4 +1,7 @@
-{% extends "deepweb/base.html" %} {% block contenu %} {% if messages %}
+{% extends "deepweb/base.html" %}
+{% load score_filters %}
+{% block contenu %}
+{% if messages %}
 <ul class="messages list-unstyled">
   {% for message in messages %}
   <li {% if message.tags %} class="alert alert-{{ message.tags }} " {% endif %}>
@@ -48,28 +51,36 @@
 </form>
 
 
-  <ul class="list-unstyled">
-    {% for ip in results %}
-    <li>
-      <div class="card">
-        <div class="card-body ">
-        <div class="d-flex justify-content-around align-items-center">
-            <h4>
-              {% if ip.country_code %}<span class="fi fi-{{ ip.country_code|lower }} me-2" title="{{ ip.country_name }}"></span>{% else %}<span class="fi fi-un me-2" title="Pays inconnu"></span>{% endif %}
-              <a href="{% url 'ip_detail' ip.address %}" class="text-decoration-none">{{ ip.address }}</a>
-            </h4>
-            <p>Score {{ ip.reputation_score }}/100</p>
-            <p>Création : {{ ip.created_at|date:"Y-m-d" }}</p>
-        </div>
-
-
-
-     </div>
-    </li>
-    {% empty %}
-    <li>Aucun résultat trouvé.</li>
-    {% endfor %}
-  </ul>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th scope="col">Pays</th>
+          <th scope="col">Adresse IP</th>
+          <th scope="col">Score</th>
+          <th scope="col">Création</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ip in results %}
+        <tr>
+          <td>
+            {% if ip.country_code %}<span class="fi fi-{{ ip.country_code|lower }}" title="{{ ip.country_name }}"></span>{% else %}<span class="fi fi-un" title="Pays inconnu"></span>{% endif %}
+          </td>
+          <td>
+            <a href="{% url 'ip_detail' ip.address %}" class="text-decoration-none fw-semibold">{{ ip.address }}</a>
+          </td>
+          <td class="{{ ip.reputation_score|score_text_class }} fw-bold">{{ ip.reputation_score }}</td>
+          <td class="text-muted">{{ ip.created_at|date:"Y-m-d" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" class="text-center text-muted py-4">Aucun résultat trouvé.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </section>
 
 <section>
