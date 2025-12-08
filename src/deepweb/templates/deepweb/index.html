@@ -1,4 +1,6 @@
-{% extends "deepweb/base.html" %} {% block contenu %}
+{% extends "deepweb/base.html" %}
+{% load score_filters %}
+{% block contenu %}
 <h1>BlockList</h1>
 <p><strong>BlockList</strong> est un service communautaire pour rechercher et signaler des adresses IP suspectes.</p>
 
@@ -48,7 +50,7 @@
         <div class="card-body ">
         <div class="d-flex justify-content-around" >
             <h4><a href="{% url 'ip_detail' ip.address %}" class="text-decoration-none">IPV{{ip.version}} : {{ip.address}}</a></h4>
-            <p>Score {{ip.reputation_score}}/100</p>
+            <p class="{{ ip.reputation_score|score_text_class }} fw-bold">Score {{ ip.reputation_score }}/100</p>
             <p>Création : {{ip.created_at.year}}-{{ip.created_at.month}}-{{ip.created_at.day}}</p>
 
         </div>

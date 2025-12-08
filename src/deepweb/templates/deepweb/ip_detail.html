@@ -1,5 +1,6 @@
 {% extends "deepweb/base.html" %}
 {% load static %}
+{% load score_filters %}
 
 {% block title %}Détails IP - {{ ip_address.address }}{% endblock %}
 
@@ -13,9 +14,9 @@
       </div>
       <div class="card-body">
         <!-- Confidence Score Progress Bar -->
-        <p>Cette IP a été signalée <b id="header-total-reports">{{ total_reports }}</b> fois. Score de réputation : <b id="header-reputation-score">{{ ip_address.reputation_score }}%</b></p>
+        <p>Cette IP a été signalée <b id="header-total-reports">{{ total_reports }}</b> fois. Score de réputation : <b id="header-reputation-score" class="{{ ip_address.reputation_score|score_text_class }}">{{ ip_address.reputation_score }}%</b></p>
         <div class="progress mb-3" style="height: 36px;">
-          <div id="reputation-progress-bar" class="progress-bar {% if ip_address.reputation_score >= 70 %}bg-success{% elif ip_address.reputation_score >= 40 %}bg-warning text-dark{% else %}bg-danger{% endif %}"
+          <div id="reputation-progress-bar" class="progress-bar {{ ip_address.reputation_score|score_bg_class }}"
                role="progressbar"
                style="width: {{ ip_address.reputation_score }}%; font-size: 16px; line-height: 36px; min-width: 3em;"
                aria-valuenow="{{ ip_address.reputation_score }}"
@@ -258,6 +259,19 @@
 <script src="{% static 'deepweb/js/ip-charts.js' %}"></script>
 
 <script>
+// Score color helper functions (mirrors Python score_filters.py)
+function getScoreTextClass(score) {
+  if (score >= 70) return 'text-success';
+  if (score >= 40) return 'text-warning';
+  return 'text-danger';
+}
+
+function getScoreBgClass(score) {
+  if (score >= 70) return 'bg-success';
+  if (score >= 40) return 'bg-warning text-dark';
+  return 'bg-danger';
+}
+
 // AJAX Live Updates for Reports
 document.addEventListener('DOMContentLoaded', function() {
   const ipAddress = '{{ ip_address.address }}';
@@ -299,21 +313,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (headerReputationScore) {
       headerReputationScore.textContent = ipInfo.reputation_score + '%';
+      headerReputationScore.className = getScoreTextClass(ipInfo.reputation_score);
     }
 
     if (reputationProgressBar) {
       reputationProgressBar.style.width = ipInfo.reputation_score + '%';
       reputationProgressBar.textContent = ipInfo.reputation_score + '%';
       reputationProgressBar.setAttribute('aria-valuenow', ipInfo.reputation_score);
-
-      reputationProgressBar.className = 'progress-bar';
-      if (ipInfo.reputation_score >= 70) {
-        reputationProgressBar.classList.add('bg-success');
-      } else if (ipInfo.reputation_score >= 40) {
-        reputationProgressBar.classList.add('bg-warning', 'text-dark');
-      } else {
-        reputationProgressBar.classList.add('bg-danger');
-      }
+      reputationProgressBar.className = 'progress-bar ' + getScoreBgClass(ipInfo.reputation_score);
     }
 
     if (ipCreatedAt) ipCreatedAt.textContent = ipInfo.created_at;
