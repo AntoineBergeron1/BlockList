@@ -11,9 +11,10 @@ register = template.Library()
 @register.filter
 def score_text_class(score):
     """
-    Returns Bootstrap text color class based on reputation score.
+    Returns CSS class for reputation score text color.
+    Uses custom color for medium scores to meet WCAG AA contrast requirements.
     - Green (text-success): score >= 70 (good reputation)
-    - Yellow (text-warning): score >= 40 (medium reputation)
+    - Custom gold: score >= 40 (medium reputation) - via score-warning class
     - Red (text-danger): score < 40 (bad reputation)
     """
     try:
@@ -24,7 +25,7 @@ def score_text_class(score):
     if score >= 70:
         return "text-success"
     elif score >= 40:
-        return "text-warning"
+        return "score-warning"
     return "text-danger"
 
 
