@@ -3,12 +3,144 @@
 {% block title %}Modifier mon compte{% endblock %}
 
 {% block contenu %}
-<form action="{% url 'modifier_compte' request.user.id %}" method="post" novalidate>
-    {% csrf_token %}
-    {{form.as_p }}
-    <input class="btn btn-primary" type="submit" value="Enregistrer les changements" />
- </form>
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <form action="{% url 'modifier_compte' request.user.id %}" method="post" novalidate>
+      {% csrf_token %}
 
- <a class="btn btn-danger" href="{%url 'confirmer_suppression' %}">Supprimer le compte</a>
+      <!-- Informations du profil -->
+      <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Informations du profil</h5>
+        </div>
+        <div class="card-body">
+          <!-- Nom d'utilisateur (lecture seule) -->
+          <div class="mb-3">
+            <label for="{{ form.username.id_for_label }}" class="form-label">
+              {{ form.username.label }}
+            </label>
+            {{ form.username }}
+            <div class="form-text">Le nom d'utilisateur ne peut pas être modifié.</div>
+          </div>
 
+          <div class="row">
+            <!-- Prénom -->
+            <div class="col-md-6 mb-3">
+              <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                {{ form.first_name.label }}
+                <span class="text-danger">*</span>
+              </label>
+              {{ form.first_name }}
+              {% if form.first_name.errors %}
+                <div class="invalid-feedback d-block">
+                  {% for error in form.first_name.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Nom de famille -->
+            <div class="col-md-6 mb-3">
+              <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                {{ form.last_name.label }}
+                <span class="text-danger">*</span>
+              </label>
+              {{ form.last_name }}
+              {% if form.last_name.errors %}
+                <div class="invalid-feedback d-block">
+                  {% for error in form.last_name.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="mb-3">
+            <label for="{{ form.email.id_for_label }}" class="form-label">
+              {{ form.email.label }}
+              <span class="text-danger">*</span>
+            </label>
+            {{ form.email }}
+            {% if form.email.errors %}
+              <div class="invalid-feedback d-block">
+                {% for error in form.email.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Modification du mot de passe -->
+      <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+          <h5 class="mb-0">Modifier le mot de passe</h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted small mb-3">
+            Laissez ces champs vides si vous ne souhaitez pas modifier votre mot de passe.
+          </p>
+
+          <div class="row">
+            <!-- Nouveau mot de passe -->
+            <div class="col-md-6 mb-3">
+              <label for="{{ form.password.id_for_label }}" class="form-label">
+                {{ form.password.label }}
+              </label>
+              {{ form.password }}
+              {% if form.password.errors %}
+                <div class="invalid-feedback d-block">
+                  {% for error in form.password.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Confirmer mot de passe -->
+            <div class="col-md-6 mb-3">
+              <label for="{{ form.password_confirm.id_for_label }}" class="form-label">
+                {{ form.password_confirm.label }}
+              </label>
+              {{ form.password_confirm }}
+              {% if form.password_confirm.errors %}
+                <div class="invalid-feedback d-block">
+                  {% for error in form.password_confirm.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bouton de sauvegarde -->
+      <div class="d-grid mb-4">
+        <button type="submit" class="btn btn-primary btn-lg">
+          Enregistrer les modifications
+        </button>
+      </div>
+    </form>
+
+    <!-- Zone de danger -->
+    <div class="card border-danger">
+      <div class="card-header bg-danger text-white">
+        <h5 class="mb-0">Zone de danger</h5>
+      </div>
+      <div class="card-body">
+        <p class="text-muted mb-3">
+          La suppression de votre compte est irréversible. Toutes vos données seront définitivement effacées.
+        </p>
+        <a class="btn btn-outline-danger" href="{% url 'confirmer_suppression' %}">
+          Supprimer mon compte
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

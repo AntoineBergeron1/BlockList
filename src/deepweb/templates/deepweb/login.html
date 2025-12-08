@@ -1,60 +1,74 @@
 {% extends "deepweb/base.html" %}
+{% block title %}Connexion{% endblock %}
 
 {% block contenu %}
+<div class="row justify-content-center">
+  <div class="col-lg-5">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">Connexion</h4>
+      </div>
+      <div class="card-body">
+        <form method="POST" novalidate id="loginForm">
+          {% csrf_token %}
 
-    {% if form.errors %}
-        <div class="alert alert-danger">
-            {% for field, errors in form.errors.items %}
-              {% for error in errors %}
-                <p>{{ error }}</p>
+          <!-- Nom d'utilisateur -->
+          <div class="mb-3">
+            <label for="{{ form.username.id_for_label }}" class="form-label">
+              {{ form.username.label }}
+              <span class="text-danger">*</span>
+            </label>
+            {{ form.username }}
+            {% if form.username.errors %}
+              <div class="invalid-feedback d-block">
+                {% for error in form.username.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Mot de passe -->
+          <div class="mb-3">
+            <label for="{{ form.password.id_for_label }}" class="form-label">
+              {{ form.password.label }}
+              <span class="text-danger">*</span>
+            </label>
+            {{ form.password }}
+            {% if form.password.errors %}
+              <div class="invalid-feedback d-block">
+                {% for error in form.password.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Non-field errors -->
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {% for error in form.non_field_errors %}
+                {{ error }}
               {% endfor %}
-            {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- Bouton -->
+          <div class="d-grid mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">
+              Se connecter
+            </button>
+          </div>
+        </form>
+
+        <div class="text-center mt-3">
+          <p class="text-muted">
+            Pas encore de compte ?
+            <a href="{% url 'register' %}">Créer un compte</a>
+          </p>
         </div>
-    {% endif %}
-
-<form method="POST" novalidate id="loginForm">
-{% csrf_token %}
-{{form}}
-<input class="btn btn-primary" type="submit" value="Se connecter">
-</form>
-
-{% comment %}
-Quick Login buttons - Commented out for production demo
-{% if debug %}
-<div class="mt-4">
-    <p class="text-muted small">Quick Login (Development):</p>
-    <button type="button" class="btn btn-sm me-2 quick-login-user" onclick="fillLogin('user', 'user123')">User Test</button>
-    <button type="button" class="btn btn-sm quick-login-admin" onclick="fillLogin('admin', 'admin123')">Admin Test</button>
+      </div>
+    </div>
+  </div>
 </div>
-
-<style>
-.quick-login-user {
-    background-color: #007bff !important;
-    border-color: #007bff !important;
-    color: white !important;
-}
-.quick-login-user:hover {
-    background-color: #0056b3 !important;
-    border-color: #0056b3 !important;
-}
-.quick-login-admin {
-    background-color: #dc3545 !important;
-    border-color: #dc3545 !important;
-    color: white !important;
-}
-.quick-login-admin:hover {
-    background-color: #c82333 !important;
-    border-color: #c82333 !important;
-}
-</style>
-
-<script>
-function fillLogin(username, password) {
-    document.getElementById('id_username').value = username;
-    document.getElementById('id_password').value = password;
-}
-</script>
-{% endif %}
-{% endcomment %}
-
 {% endblock %}
