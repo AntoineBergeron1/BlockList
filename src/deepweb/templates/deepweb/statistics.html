@@ -11,18 +11,20 @@
   <p class="lead">Nombre d'adresses IP signalées dans les dernières...</p>
   <div class="table-responsive mb-5">
     <table class="table table-bordered text-center">
+      <thead class="table-dark">
+        <tr>
+          <th scope="col">1 Heure</th>
+          <th scope="col">24 Heures</th>
+          <th scope="col">7 Jours</th>
+          <th scope="col">30 Jours</th>
+        </tr>
+      </thead>
       <tbody>
         <tr>
           <td class="fs-4 fw-bold">{{ reports_last_hour|default:"0" }}</td>
           <td class="fs-4 fw-bold">{{ reports_last_24h|default:"0" }}</td>
           <td class="fs-4 fw-bold">{{ reports_last_7d|default:"0" }}</td>
           <td class="fs-4 fw-bold">{{ reports_last_30d|default:"0" }}</td>
-        </tr>
-        <tr>
-          <th>1 Heure</th>
-          <th>24 Heures</th>
-          <th>7 Jours</th>
-          <th>30 Jours</th>
         </tr>
       </tbody>
     </table>
