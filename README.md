@@ -23,23 +23,22 @@ Les objectifs pédagogiques incluent la gestion de projet agile, le développeme
 * **Gestion des utilisateurs :** Inscription, connexion, profils avec authentification sécurisée
 * **Vérification d'IP :** Consultation de la réputation d'adresses IPv4/IPv6
 * **Signalement d'abus :** Soumission de rapports sur des IP malveillantes
-* **Historique et statistiques :** Consultation de l'historique des abus avec système de quotas
+* **Historique et statistiques :** Consultation de l'historique des abus (avec système de quotas)
 * **Recherche avancée :** Filtres multiples et tri dynamique
 * **Validations AJAX :** Validation en temps réel des formulaires
 
 # TECHNOLOGIES UTILISÉES
 
 ## Backend
-* **Framework :** Django 5.2 (LTS)
+* **Framework :** Django 6.0
 * **Langage :** Python 3.13+
 * **Base de données :** PostgreSQL
 * **ORM :** Django ORM
 
 ## Frontend
 * **HTML5/CSS3**
-* **JavaScript (ES6+)** [À COMPLÉTER]
-* **Framework CSS :** Bootstrap 5.x / [À COMPLÉTER]
-* **AJAX :** [À COMPLÉTER]
+* **JavaScript (ES6+)**
+* **Framework CSS :** Bootstrap 5.x
 
 ## Outils de développement
 * **Gestion de version :** Git/GitHub
@@ -96,17 +95,7 @@ L'application sera accessible à : http://127.0.0.1:8000/
 Nous suivons les conventions Django standards documentées dans le cours 420-15D-FX (Applications Web et sécurité) :
 * **Documentation de référence :** https://15d.gitlab.io/docs/django/7-conventions.html
 
-## JavaScript
-
-[À COMPLÉTER]
-
-## Git
-
 Pour les conventions de commit et le workflow Git, consultez notre **[Guide des conventions Git](https://github.com/MaximeMichaud/420-18D-FX-Maxime-Antoine-Ariane/wiki/Conventions-Git)** dans le wiki.
-
-# TESTS [À COMPLÉTER]
-```bash
-```
 
 # DÉPLOIEMENT
 
@@ -129,10 +118,5 @@ docker compose up -d
 # LICENCE
 Ce projet est développé dans le cadre du cours 420-18D-FX au Cégep Garneau.
 
-# CONTACT
-* **Professeur :** Nicolas Richard - nrichard@cegepgarneau.ca
-* **Équipe de développement :** Via Trello & Teams
-
 # REMERCIEMENTS
 * Nicolas Richard - Professeur du cours
-* Département d'informatique - Cégep Garneau
