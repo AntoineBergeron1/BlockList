@@ -59,9 +59,9 @@ def index(request):
                 results = results.filter(version=versionSelectionnee)
 
             if optiontri == "reputationDesc":
-                results = results.order_by("-reputation_score")
-            elif optiontri == "reputationAsc":
                 results = results.order_by("reputation_score")
+            elif optiontri == "reputationAsc":
+                results = results.order_by("-reputation_score")
             elif optiontri == "modificationDesc":
                 results = results.order_by("-updated_at")
             else:
