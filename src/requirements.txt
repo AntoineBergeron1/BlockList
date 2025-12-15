@@ -16,7 +16,7 @@ pycodestyle==2.14.0
 python-dotenv==1.2.1
 setuptools==80.9.0
 sqlparse==0.5.4
-tzdata==2025.2
+tzdata==2025.3
 watchdog==6.0.0
 wheel==0.45.1
 
