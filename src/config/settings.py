@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-sbrmgx8rz%qs9kb4+zq-t+wyvlbk8n^4#2y&b%o(_lt9)wqtf^"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
 
 AUTH_USER_MODEL = "deepweb.User"
 
