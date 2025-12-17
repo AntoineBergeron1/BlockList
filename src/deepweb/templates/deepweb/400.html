@@ -1,0 +1,16 @@
+{% extends "deepweb/base.html" %}
+
+{% block title %}Erreur 400 - Requête invalide{% endblock %}
+
+{% block contenu %}
+<div class="text-center py-5">
+    <h1 class="display-1 text-danger">400</h1>
+    <h2 class="mb-4">Requête invalide</h2>
+    <p class="lead text-muted mb-4">
+        La requête envoyée au serveur est malformée ou invalide.
+    </p>
+    <a href="{% url 'index' %}" class="btn btn-primary">
+        Retour à l'accueil
+    </a>
+</div>
+{% endblock %}

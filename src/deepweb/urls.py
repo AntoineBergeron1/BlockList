@@ -1,9 +1,17 @@
+from django.conf import settings
 from django.urls import path
 
 from . import views
 
 urlpatterns = [
     path("", views.index, name="index"),
+    # Error pages (for testing and direct access)
+    path("error/400/", views.error_400, name="error_400"),
+    path("error/401/", views.error_401, name="error_401"),
+    path("error/403/", views.error_403, name="error_403"),
+    path("error/404/", views.error_404, name="error_404"),
+    path("error/405/", views.error_405, name="error_405"),
+    path("error/500/", views.error_500, name="error_500"),
     path("signup/", views.register, name="signup"),
     path("accounts/register/", views.register, name="register"),
     path("accounts/login/", views.connecter, name="connecter"),

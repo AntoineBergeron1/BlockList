@@ -27,3 +27,9 @@ urlpatterns = [
     path("", include("deepweb.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
 ]
+
+# Custom error handlers
+handler400 = "deepweb.views.error_400"
+handler403 = "deepweb.views.error_403"
+handler404 = "deepweb.views.error_404"
+handler500 = "deepweb.views.error_500"

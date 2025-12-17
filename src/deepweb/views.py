@@ -732,3 +732,34 @@ def check_email(request):
         exists = User.objects.filter(email=email, is_active=True).exists()
         return JsonResponse({"exists": exists})
     return JsonResponse({"exists": False})
+
+
+# Custom error views
+def error_400(request, exception=None):
+    """Bad Request error page"""
+    return render(request, "deepweb/400.html", status=400)
+
+
+def error_401(request):
+    """Unauthorized error page"""
+    return render(request, "deepweb/401.html", status=401)
+
+
+def error_403(request, exception=None):
+    """Forbidden error page"""
+    return render(request, "deepweb/403.html", status=403)
+
+
+def error_404(request, exception=None):
+    """Not Found error page"""
+    return render(request, "deepweb/404.html", status=404)
+
+
+def error_405(request, exception=None):
+    """Method Not Allowed error page"""
+    return render(request, "deepweb/405.html", status=405)
+
+
+def error_500(request):
+    """Internal Server Error page"""
+    return render(request, "deepweb/500.html", status=500)
